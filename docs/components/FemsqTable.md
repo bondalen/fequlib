@@ -2,20 +2,34 @@
 
 Тонкая обёртка над Quasar `QTable`: единый контракт фильтрации/сортировки/форматирования.
 
-**Пакет:** `fequlib` · **импорт:** `import { FemsqTable, actionsColumn } from 'fequlib'`
+**Пакет:** `fequlib` · **импорт:** `import { FemsqTable, actionsColumn, type FemsqTableColumn } from 'fequlib'`
 
-## Контракт (фазы A–B)
+## Контракт (фазы A–B + generic Row)
 
 | Принцип | Суть |
 |---|---|
+| Generic `Row` | `rows: Row[]`, `columns: FemsqTableColumn<Row>[]`; `@row-click` отдаёт `Row` |
+| `FemsqTableRowBase` | `Record<string, any>` — DTO-интерфейсы без index signature без `as unknown as` |
 | `cellText(row, col)` | `col.format ? col.format(value, row) : String(value ?? '')` |
 | `filterValue?: (row) => string` | Для `#body-cell-*`, если колонка в поиске; иначе `filterable: false` или dev-warning |
 | `actionsColumn()` | `filterable: false`, `sortable: false` — без UI колоночного фильтра |
 | `mode: 'client' \| 'server'` | Server эмитит `@request` `{ filter, columnFilters?, sortBy, descending, page, rowsPerPage }` |
 | Глобальный фильтр | `v-model:filter` / `showFilter` — подстрока по всем `filterable`-колонкам |
 | Поколоночные фильтры (B) | Под заголовком у колонок с `filterable !== false`; `v-model:columnFilters`; AND с глобальным |
-| `showColumnFilters` | Опционально выключить UI колоночных фильтров (по умолчанию `true`) |
 | Additive-first | Новые API только опциональные |
+
+```ts
+import { FemsqTable, type FemsqTableColumn } from 'fequlib';
+import type { ConstructionSiteDto } from '@/types/...';
+
+const columns: FemsqTableColumn<ConstructionSiteDto>[] = [
+  { name: 'cstName', label: 'Имя', field: 'cstName' },
+  { name: 'cstKey', label: 'Key', field: 'cstKey' }
+];
+
+// template: <FemsqTable :rows="sites" :columns="columns" @row-click="onClick" />
+function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизирован */ }
+```
 
 Агрегатные предикаты (COUNT/EXISTS) — обычные колонки строки, не единственный UI-тумблер.
 

@@ -65,11 +65,12 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="Row extends Record<string, any> = Record<string, any>">
 /**
  * FemsqTable — обёртка над Quasar QTable с единым контрактом фильтрации/сортировки.
  * Фаза A: client-mode + server/@request.
  * Фаза B: поколоночные текстовые фильтры (AND с глобальным).
+ * Generic Row: DTO-интерфейсы без index signature принимаются без кастов.
  */
 import { computed, onMounted, ref, useAttrs, useSlots, watch } from 'vue';
 import { QIcon, QInput, QTable, QTh, type QTableColumn, type QTableProps } from 'quasar';
@@ -90,14 +91,12 @@ defineOptions({
   inheritAttrs: false
 });
 
-type Row = Record<string, unknown>;
-
 const props = withDefaults(
   defineProps<{
     /** Исходные строки (полный набор в client; страница/выборка — в server). */
     rows: Row[];
-    /** Описание колонок (FemsqTableColumn). */
-    columns: FemsqTableColumn[];
+    /** Описание колонок (FemsqTableColumn&lt;Row&gt;). */
+    columns: FemsqTableColumn<Row>[];
     /** Режим: client (по умолчанию) или server. */
     mode?: FemsqTableMode;
     /** Внешний текст фильтра (v-model:filter). */

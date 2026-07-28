@@ -12,5 +12,6 @@ export {
   sortComparable,
   type FemsqTableColumn,
   type FemsqTableMode,
-  type FemsqTableRequest
+  type FemsqTableRequest,
+  type FemsqTableRowBase
 } from './components/table/femsq-table';

@@ -1,6 +1,15 @@
 import type { QTableColumn } from 'quasar';
 
 /**
+ * Базовый тип строки таблицы.
+ * `any` в значении — намеренно: DTO-интерфейсы без index signature
+ * (например ConstructionSiteDto) не удовлетворяют `Record<string, unknown>`,
+ * но должны проходить в `rows`/`FemsqTableColumn` без `as unknown as`.
+ * Согласовано с `QTableColumn<T = any>` Quasar.
+ */
+export type FemsqTableRowBase = Record<string, any>;
+
+/**
  * Режим работы FemsqTable: client — фильтр/сортировка на клиенте;
  * server — данные готовит родитель, компонент эмитит @request.
  */
@@ -23,21 +32,20 @@ export interface FemsqTableRequest {
 /**
  * Колонка FemsqTable: расширяет QTableColumn полями фильтрации.
  */
-export type FemsqTableColumn<Row extends Record<string, unknown> = Record<string, unknown>> =
-  QTableColumn<Row> & {
-    /** Участвует ли колонка в глобальном фильтре (по умолчанию true). */
-    filterable?: boolean;
-    /**
-     * Текст для фильтра, если ячейка рисуется через #body-cell-* и стандартный
-     * cellText не отражает смысл (иконки/кнопки).
-     */
-    filterValue?: (row: Row) => string;
-  };
+export type FemsqTableColumn<Row extends FemsqTableRowBase = FemsqTableRowBase> = QTableColumn<Row> & {
+  /** Участвует ли колонка в глобальном фильтре (по умолчанию true). */
+  filterable?: boolean;
+  /**
+   * Текст для фильтра, если ячейка рисуется через #body-cell-* и стандартный
+   * cellText не отражает смысл (иконки/кнопки).
+   */
+  filterValue?: (row: Row) => string;
+};
 
 /**
  * Значение поля колонки (как у QTable: field string | function).
  */
-export function columnFieldValue<Row extends Record<string, unknown>>(
+export function columnFieldValue<Row extends FemsqTableRowBase>(
   row: Row,
   col: FemsqTableColumn<Row>
 ): unknown {
@@ -54,7 +62,7 @@ export function columnFieldValue<Row extends Record<string, unknown>>(
 /**
  * Текст ячейки для фильтра/отображения: format(value, row) либо String(value ?? '').
  */
-export function cellText<Row extends Record<string, unknown>>(
+export function cellText<Row extends FemsqTableRowBase>(
   row: Row,
   col: FemsqTableColumn<Row>
 ): string {
@@ -68,7 +76,7 @@ export function cellText<Row extends Record<string, unknown>>(
 /**
  * Текст, по которому колонка участвует в глобальном поиске.
  */
-export function columnFilterText<Row extends Record<string, unknown>>(
+export function columnFilterText<Row extends FemsqTableRowBase>(
   row: Row,
   col: FemsqTableColumn<Row>
 ): string {
@@ -81,7 +89,7 @@ export function columnFilterText<Row extends Record<string, unknown>>(
 /**
  * Хелпер колонки действий: filterable/sortable выключены сразу.
  */
-export function actionsColumn<Row extends Record<string, unknown> = Record<string, unknown>>(
+export function actionsColumn<Row extends FemsqTableRowBase = FemsqTableRowBase>(
   partial: Partial<FemsqTableColumn<Row>> = {}
 ): FemsqTableColumn<Row> {
   return {
@@ -161,7 +169,7 @@ export function compareCellValues(a: unknown, b: unknown): number {
 /**
  * Строка проходит глобальный фильтр, если needle пустой или найден в filterable-колонках.
  */
-export function rowMatchesFilter<Row extends Record<string, unknown>>(
+export function rowMatchesFilter<Row extends FemsqTableRowBase>(
   row: Row,
   columns: FemsqTableColumn<Row>[],
   filter: string
@@ -182,7 +190,7 @@ export function rowMatchesFilter<Row extends Record<string, unknown>>(
  * Строка проходит все поколоночные текстовые фильтры (AND).
  * Пустые значения и колонки с filterable: false игнорируются.
  */
-export function rowMatchesColumnFilters<Row extends Record<string, unknown>>(
+export function rowMatchesColumnFilters<Row extends FemsqTableRowBase>(
   row: Row,
   columns: FemsqTableColumn<Row>[],
   columnFilters: Record<string, string> | undefined | null
@@ -209,7 +217,7 @@ export function rowMatchesColumnFilters<Row extends Record<string, unknown>>(
 /**
  * Глобальный фильтр AND поколоночные фильтры.
  */
-export function rowMatchesAllFilters<Row extends Record<string, unknown>>(
+export function rowMatchesAllFilters<Row extends FemsqTableRowBase>(
   row: Row,
   columns: FemsqTableColumn<Row>[],
   filter: string,

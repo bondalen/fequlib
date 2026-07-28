@@ -190,3 +190,21 @@ describe('sortComparable / compareCellValues', () => {
     expect(sorted.slice(3)).toEqual([null, '']);
   });
 });
+
+describe('generic Row (DTO interface without index signature)', () => {
+  interface SiteDto {
+    cstKey: number;
+    cstName: string;
+  }
+
+  it('accepts interface rows/columns without cast', () => {
+    const columns: FemsqTableColumn<SiteDto>[] = [
+      { name: 'cstName', label: 'Name', field: 'cstName' },
+      { name: 'cstKey', label: 'Key', field: 'cstKey' }
+    ];
+    const row: SiteDto = { cstKey: 1, cstName: 'Alpha' };
+    expect(cellText(row, columns[0])).toBe('Alpha');
+    expect(rowMatchesFilter(row, columns, 'alp')).toBe(true);
+    expect(rowMatchesAllFilters(row, columns, '', { cstName: 'Alpha' })).toBe(true);
+  });
+});
