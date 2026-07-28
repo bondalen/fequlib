@@ -2,20 +2,20 @@
 
 Quasar UI Kit для FEMSQ и смежных проектов. Первый компонент — `FemsqTable`.
 
-Документация проекта ведётся в **docs-registry** (Postgres), не в локальном JSON — см. Решение 008 FEMSQ.
+**Репозиторий:** https://github.com/bondalen/fequlib  
+**npm-пакет:** `fequlib`
+
+Документация: [`docs/`](./docs/README.md). Задачи — в [docs-registry](https://github.com/bondalen/docs-registry) (проект `fequlib`), не в локальном JSON.
 
 ## Установка (локальная зависимость)
 
-```bash
-# из femsq-frontend-q
-npm install ../../../feQuLib
-```
-
-Или в `package.json`:
+Пока FEMSQ рядом на диске:
 
 ```json
 "fequlib": "file:../../../feQuLib"
 ```
+
+(папка клона может называться `feQuLib`, имя пакета — `fequlib`.)
 
 ## Использование
 
@@ -23,6 +23,9 @@ npm install ../../../feQuLib
 import { FemsqTable, actionsColumn, type FemsqTableColumn } from 'fequlib';
 ```
 
-## Реестр документации
+## Связанные проекты
 
-Проект зарегистрирован как `fequlib` в `/home/alex/projects/docs-registry`.
+| Проект | Роль |
+|---|---|
+| [FEMSQ](https://github.com/bondalen/femsq) | Первый потребитель |
+| [docs-registry](https://github.com/bondalen/docs-registry) | Реестр задач/журнала |

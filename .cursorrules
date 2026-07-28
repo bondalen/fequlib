@@ -1,0 +1,29 @@
+# Правила Cursor для feQuLib
+
+## Контекст
+Quasar UI Kit / библиотека компонентов для FEMSQ и смежных проектов. Первый компонент — `FemsqTable`. Пакет npm: `fequlib`. Репозиторий: https://github.com/bondalen/fequlib
+
+## Принципы
+- peerDependencies: `vue`, `quasar` — не бандлить их в пакет.
+- Additive-first API: новые пропсы/слоты только опциональные; breaking — через deprecate-цикл.
+- Не тащить доменную логику FEMSQ (стройки, отчёты) в библиотеку — только UI-контракты.
+- Markdown в `docs/` — объяснения и планы; **задачи** — в docs-registry (`npm run cli` в `/home/alex/projects/docs-registry`), проект `fequlib`. Не заводить локальный `project-development.json`.
+- TreeList (иерархия) — отдельный будущий компонент, не режим `FemsqTable`.
+
+## Стек
+- Vue 3 + Quasar 2 + TypeScript
+- Сейчас: plain package (`src/` + `types/`), не App Extension — App Extension при появлении 2-го потребителя.
+
+## Документация
+- Оглавление: `docs/README.md`
+- Компонент: `docs/components/FemsqTable.md`
+- Roadmap: `docs/roadmap.md`
+- Планы: `docs/development/notes/chats/chat-plan/`
+
+## Связанные репозитории
+- https://github.com/bondalen/fequlib (этот)
+- https://github.com/bondalen/docs-registry
+- FEMSQ: `/home/alex/projects/femsq` (потребитель `file:../../../feQuLib`)
+
+**Создано:** 2026-07-28  
+**Версия:** 0.1.0
