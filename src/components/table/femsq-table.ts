@@ -8,9 +8,12 @@ export type FemsqTableMode = 'client' | 'server';
 
 /**
  * Параметры запроса (filter/sort/page) — контракт для mode=server и резерв для client.
+ * `columnFilters` — опционально (фаза B); отсутствие поля = нет поколоночных фильтров.
  */
 export interface FemsqTableRequest {
   filter: string;
+  /** Текстовые фильтры по имени колонки (AND с `filter`). Только непустые значения. */
+  columnFilters?: Record<string, string>;
   sortBy: string | null;
   descending: boolean;
   page: number;
@@ -173,4 +176,66 @@ export function rowMatchesFilter<Row extends Record<string, unknown>>(
     }
     return columnFilterText(row, col).toLowerCase().includes(needle);
   });
+}
+
+/**
+ * Строка проходит все поколоночные текстовые фильтры (AND).
+ * Пустые значения и колонки с filterable: false игнорируются.
+ */
+export function rowMatchesColumnFilters<Row extends Record<string, unknown>>(
+  row: Row,
+  columns: FemsqTableColumn<Row>[],
+  columnFilters: Record<string, string> | undefined | null
+): boolean {
+  if (!columnFilters) {
+    return true;
+  }
+  for (const [name, raw] of Object.entries(columnFilters)) {
+    const needle = (raw ?? '').trim().toLowerCase();
+    if (!needle) {
+      continue;
+    }
+    const col = columns.find((item) => item.name === name);
+    if (!col || col.filterable === false) {
+      continue;
+    }
+    if (!columnFilterText(row, col).toLowerCase().includes(needle)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Глобальный фильтр AND поколоночные фильтры.
+ */
+export function rowMatchesAllFilters<Row extends Record<string, unknown>>(
+  row: Row,
+  columns: FemsqTableColumn<Row>[],
+  filter: string,
+  columnFilters?: Record<string, string> | null
+): boolean {
+  return (
+    rowMatchesFilter(row, columns, filter) &&
+    rowMatchesColumnFilters(row, columns, columnFilters)
+  );
+}
+
+/**
+ * Убирает пустые значения из карты колоночных фильтров (для @request payload).
+ */
+export function normalizeColumnFilters(
+  columnFilters: Record<string, string> | undefined | null
+): Record<string, string> | undefined {
+  if (!columnFilters) {
+    return undefined;
+  }
+  const out: Record<string, string> = {};
+  for (const [name, raw] of Object.entries(columnFilters)) {
+    const value = (raw ?? '').trim();
+    if (value) {
+      out[name] = value;
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
 }

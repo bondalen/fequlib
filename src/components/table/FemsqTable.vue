@@ -33,6 +33,31 @@
       @request="mode === 'server' ? onQuasarRequest : undefined"
       @row-click="onRowClick"
     >
+      <template
+        v-for="colName in autoFilterHeaderColumns"
+        :key="`col-filter-${colName}`"
+        #[`header-cell-${colName}`]="slotProps"
+      >
+        <QTh :props="slotProps" class="femsq-table__th">
+          <div class="femsq-table__header-cell">
+            <div class="femsq-table__header-label">{{ slotProps.col.label }}</div>
+            <QInput
+              dense
+              borderless
+              clearable
+              debounce="200"
+              :model-value="columnFilterValue(colName)"
+              :placeholder="columnFilterPlaceholder"
+              :data-test="`femsq-table-col-filter-${colName}`"
+              class="femsq-table__col-filter"
+              @update:model-value="(v) => onColumnFilterInput(colName, v)"
+              @click.stop
+              @keydown.stop
+            />
+          </div>
+        </QTh>
+      </template>
+
       <template v-for="(_, slotName) in forwardedSlots" :key="slotName" #[slotName]="slotProps">
         <slot :name="slotName" v-bind="slotProps || {}" />
       </template>
@@ -43,16 +68,18 @@
 <script setup lang="ts">
 /**
  * FemsqTable — обёртка над Quasar QTable с единым контрактом фильтрации/сортировки.
- * Фаза A: client-mode + зарезервированный server/@request; без поколоночных фильтров.
+ * Фаза A: client-mode + server/@request.
+ * Фаза B: поколоночные текстовые фильтры (AND с глобальным).
  */
 import { computed, onMounted, ref, useAttrs, useSlots, watch } from 'vue';
-import { QIcon, QInput, QTable, type QTableColumn, type QTableProps } from 'quasar';
+import { QIcon, QInput, QTable, QTh, type QTableColumn, type QTableProps } from 'quasar';
 
 import {
   cellText,
   columnFieldValue,
   compareCellValues,
-  rowMatchesFilter,
+  normalizeColumnFilters,
+  rowMatchesAllFilters,
   type FemsqTableColumn,
   type FemsqTableMode,
   type FemsqTableRequest
@@ -75,8 +102,17 @@ const props = withDefaults(
     mode?: FemsqTableMode;
     /** Внешний текст фильтра (v-model:filter). */
     filter?: string;
-    /** Показывать строку фильтра над таблицей. */
+    /**
+     * Поколоночные текстовые фильтры (v-model:columnFilters).
+     * Ключ — `column.name`; значение — подстрока (case-insensitive).
+     */
+    columnFilters?: Record<string, string>;
+    /** Показывать строку глобального фильтра над таблицей. */
     showFilter?: boolean;
+    /** Показывать поля фильтра под заголовками filterable-колонок. */
+    showColumnFilters?: boolean;
+    /** Placeholder для поколоночных полей. */
+    columnFilterPlaceholder?: string;
     /** Показывать счётчик «N из M». */
     showFilterCount?: boolean;
     /** Подпись поля фильтра. */
@@ -93,7 +129,10 @@ const props = withDefaults(
   {
     mode: 'client',
     filter: '',
+    columnFilters: undefined,
     showFilter: true,
+    showColumnFilters: true,
+    columnFilterPlaceholder: 'Фильтр',
     showFilterCount: true,
     filterLabel: 'Фильтр',
     filterIcon: 'search',
@@ -105,6 +144,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'update:filter': [value: string];
+  'update:columnFilters': [value: Record<string, string>];
   'update:pagination': [value: NonNullable<QTableProps['pagination']>];
   /** Контракт запроса (server-режим; в client эмитится для единообразия). */
   request: [payload: FemsqTableRequest];
@@ -116,6 +156,11 @@ const slots = useSlots();
 const tableRef = ref<InstanceType<typeof QTable> | null>(null);
 
 const filterModel = computed(() => props.filter ?? '');
+
+/** Внутреннее состояние, если родитель не передаёт v-model:columnFilters. */
+const internalColumnFilters = ref<Record<string, string>>({});
+
+const columnFiltersModel = computed(() => props.columnFilters ?? internalColumnFilters.value);
 
 const internalPagination = ref<NonNullable<QTableProps['pagination']>>({
   page: 1,
@@ -147,10 +192,30 @@ const tableAttrs = computed(() => {
   };
 });
 
+/**
+ * Колонки, для которых рисуем header-фильтр сами
+ * (filterable !== false и родитель не переопределил #header-cell-*).
+ */
+const autoFilterHeaderColumns = computed(() => {
+  if (!props.showColumnFilters) {
+    return [] as string[];
+  }
+  return props.columns
+    .filter((col) => col.filterable !== false)
+    .filter((col) => !slots[`header-cell-${col.name}`])
+    .map((col) => col.name);
+});
+
 const forwardedSlots = computed(() => {
   const result: Record<string, unknown> = {};
+  const reserved = new Set(
+    autoFilterHeaderColumns.value.map((name) => `header-cell-${name}`)
+  );
   for (const name of Object.keys(slots)) {
     if (name === 'toolbar-extra') {
+      continue;
+    }
+    if (reserved.has(name)) {
       continue;
     }
     result[name] = slots[name];
@@ -164,12 +229,13 @@ const normalizedColumns = computed(() =>
     sortable: col.sortable ?? true
   }))
 );
-
 const filteredRows = computed(() => {
   if (props.mode === 'server') {
     return props.rows;
   }
-  return props.rows.filter((row) => rowMatchesFilter(row, props.columns, filterModel.value));
+  return props.rows.filter((row) =>
+    rowMatchesAllFilters(row, props.columns, filterModel.value, columnFiltersModel.value)
+  );
 });
 
 /** В client — отфильтрованные строки (сортировку делает QTable через sort-method). */
@@ -177,6 +243,10 @@ const displayRows = computed(() => filteredRows.value);
 
 const visibleCount = computed(() => filteredRows.value.length);
 const totalCount = computed(() => props.rows.length);
+
+function columnFilterValue(colName: string): string {
+  return columnFiltersModel.value[colName] ?? '';
+}
 
 /**
  * Кастомная сортировка QTable: число / дата / null в конце.
@@ -204,8 +274,10 @@ function clientSortMethod(
 function buildRequest(
   pagination: NonNullable<QTableProps['pagination']> = paginationModel.value
 ): FemsqTableRequest {
+  const columnFilters = normalizeColumnFilters(columnFiltersModel.value);
   return {
     filter: filterModel.value,
+    ...(columnFilters ? { columnFilters } : {}),
     sortBy: (pagination.sortBy as string | null | undefined) ?? null,
     descending: Boolean(pagination.descending),
     page: pagination.page ?? 1,
@@ -217,15 +289,34 @@ function emitRequest(pagination?: NonNullable<QTableProps['pagination']>): void 
   emit('request', buildRequest(pagination));
 }
 
-function onFilterInput(value: string | number | null): void {
-  const next = value == null ? '' : String(value);
-  emit('update:filter', next);
+function resetToFirstPageAndRequest(): void {
   const nextPagination: NonNullable<QTableProps['pagination']> = {
     ...paginationModel.value,
     page: 1
   };
   paginationModel.value = nextPagination;
   emitRequest(nextPagination);
+}
+
+function onFilterInput(value: string | number | null): void {
+  const next = value == null ? '' : String(value);
+  emit('update:filter', next);
+  resetToFirstPageAndRequest();
+}
+
+function onColumnFilterInput(colName: string, value: string | number | null): void {
+  const nextValue = value == null ? '' : String(value);
+  const next: Record<string, string> = { ...columnFiltersModel.value };
+  if (nextValue.trim() === '') {
+    delete next[colName];
+  } else {
+    next[colName] = nextValue;
+  }
+  if (props.columnFilters === undefined) {
+    internalColumnFilters.value = next;
+  }
+  emit('update:columnFilters', next);
+  resetToFirstPageAndRequest();
 }
 
 function onQuasarRequest(payload: {
@@ -275,12 +366,13 @@ watch(
 );
 
 watch(
-  () => [props.filter, props.mode] as const,
+  () => [props.filter, props.columnFilters, props.mode] as const,
   () => {
     if (props.mode === 'server') {
       emitRequest();
     }
-  }
+  },
+  { deep: true }
 );
 
 defineExpose({
@@ -302,6 +394,39 @@ defineExpose({
 .femsq-table__q-table {
   flex: 1 1 auto;
   min-height: 0;
+}
+
+.femsq-table__header-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+}
+
+.femsq-table__header-label {
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.femsq-table__col-filter {
+  min-width: 4.5rem;
+  font-weight: normal;
+}
+
+.femsq-table__col-filter :deep(.q-field__control) {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 4px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+}
+
+.femsq-table__col-filter :deep(.q-field__native),
+.femsq-table__col-filter :deep(.q-field__prefix),
+.femsq-table__col-filter :deep(.q-field__suffix) {
+  padding: 0;
+  min-height: 28px;
 }
 
 .col-sm-grow {

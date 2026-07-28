@@ -6,6 +6,7 @@
 - [x] Потребление из FEMSQ (`file:../../../feQuLib`)
 - [x] GitHub: https://github.com/bondalen/fequlib
 - [x] Projectize: `docs/` + `.cursorrules` + задачи в docs-registry
+- [x] Фаза B: поколоночные текстовые фильтры (AND с глобальным; `columnFilters` в `@request`)
 
 ## Backlog (задачи в registry)
 
@@ -13,7 +14,7 @@
 |---|---|---|
 | 0003 | Generic `rows`/`columns` (убрать `as unknown as Record…`) | medium |
 | 0004 | Unit-тесты: cellText / filter / sort | medium |
-| 0005 | Фаза B: поколоночные фильтры | medium |
+| 0005 | Фаза B: поколоночные фильтры | ~~medium~~ **done** |
 | 0006 | Фаза C: аудит остальных гридов потребителей | low |
 | 0007 | Фаза D: Group By (плоские строки) | low |
 | 0008 | Фазы E–G: column chooser / Filter Editor / server-side точечно | low |

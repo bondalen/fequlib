@@ -4,6 +4,8 @@ export type FemsqTableMode = 'client' | 'server';
 
 export interface FemsqTableRequest {
   filter: string;
+  /** Текстовые фильтры по имени колонки (AND с `filter`). Опционально, фаза B. */
+  columnFilters?: Record<string, string>;
   sortBy: string | null;
   descending: boolean;
   page: number;
@@ -63,6 +65,23 @@ export declare function rowMatchesFilter<Row extends Record<string, unknown>>(
   columns: FemsqTableColumn<Row>[],
   filter: string
 ): boolean;
+
+export declare function rowMatchesColumnFilters<Row extends Record<string, unknown>>(
+  row: Row,
+  columns: FemsqTableColumn<Row>[],
+  columnFilters: Record<string, string> | undefined | null
+): boolean;
+
+export declare function rowMatchesAllFilters<Row extends Record<string, unknown>>(
+  row: Row,
+  columns: FemsqTableColumn<Row>[],
+  filter: string,
+  columnFilters?: Record<string, string> | null
+): boolean;
+
+export declare function normalizeColumnFilters(
+  columnFilters: Record<string, string> | undefined | null
+): Record<string, string> | undefined;
 
 /** Vue SFC-компонент; пропсы см. README / исходник FemsqTable.vue. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
