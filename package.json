@@ -1,0 +1,39 @@
+{
+  "name": "fequlib",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Quasar UI Kit for FEMSQ and related projects (FemsqTable first)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src",
+    "types",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "quasar": "^2.16.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "quasar": "^2.16.11",
+    "typescript": "^5.4.5",
+    "vue": "^3.4.21"
+  },
+  "keywords": [
+    "quasar",
+    "vue",
+    "ui-kit",
+    "femsq",
+    "table"
+  ],
+  "license": "UNLICENSED"
+}
