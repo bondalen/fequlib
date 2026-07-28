@@ -7,13 +7,14 @@
 - [x] GitHub: https://github.com/bondalen/fequlib
 - [x] Projectize: `docs/` + `.cursorrules` + задачи в docs-registry
 - [x] Фаза B: поколоночные текстовые фильтры (AND с глобальным; `columnFilters` в `@request`)
+- [x] Unit-тесты контракта filter/sort (`vitest`, задача 0004)
 
 ## Backlog (задачи в registry)
 
 | Код | Тема | Приоритет |
 |---|---|---|
 | 0003 | Generic `rows`/`columns` (убрать `as unknown as Record…`) | medium |
-| 0004 | Unit-тесты: cellText / filter / sort | medium |
+| 0004 | Unit-тесты: cellText / filter / sort | ~~medium~~ **done** |
 | 0005 | Фаза B: поколоночные фильтры | ~~medium~~ **done** |
 | 0006 | Фаза C: аудит остальных гридов потребителей | low |
 | 0007 | Фаза D: Group By (плоские строки) | low |

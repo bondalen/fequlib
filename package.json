@@ -26,11 +26,14 @@
   "devDependencies": {
     "quasar": "^2.16.11",
     "typescript": "^5.4.5",
+    "vitest": "^3.2.7",
     "vue": "^3.4.21",
     "vue-tsc": "^2.0.29"
   },
   "scripts": {
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "quasar",
