@@ -15,10 +15,10 @@
 | 5 | Initial commit | ✅ `d46cb33` |
 | 6 | GitHub + push | ✅ https://github.com/bondalen/fequlib |
 | 7 | `docs/` + `.cursorrules` + backlog в registry | ✅ |
-| 8 | Открыть папку в отдельном окне Cursor | ☐ пользователь |
+| 8 | Открыть папку в отдельном окне Cursor | ✅ WSL: Ubuntu |
 
 ## Критерии
 
 - [x] Коммит и `origin/main`
 - [x] Scaffold docs + rules + задачи в БД
-- [ ] Отдельное окно Cursor
+- [x] Отдельное окно Cursor
