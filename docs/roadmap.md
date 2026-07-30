@@ -17,10 +17,13 @@
 | 0003 | Generic `rows`/`columns` (убрать `as unknown as Record…`) | ~~medium~~ **done** |
 | 0004 | Unit-тесты: cellText / filter / sort | ~~medium~~ **done** |
 | 0005 | Фаза B: поколоночные фильтры | ~~medium~~ **done** |
+| **0011** | **Visual chromatics: DX-эталоны + `--fequlib-table-*` токены** | **high** |
 | 0006 | Фаза C: аудит остальных гридов потребителей | low |
 | 0007 | Фаза D: Group By (плоские строки) | low |
 | 0008 | Фазы E–G: column chooser / Filter Editor / server-side точечно | low |
 | 0009 | Упаковка Quasar App Extension (когда ≥2 потребителя) | low |
+
+План визуала: [chat-plan-26-0729-femsq-table-visual.md](./development/notes/chats/chat-plan/chat-plan-26-0729-femsq-table-visual.md) · бриф [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md).
 
 ## Future (не сейчас)
 
@@ -29,3 +32,5 @@
 ## Принцип
 
 Additive-first; не ломать FEMSQ без deprecate-цикла.
+
+**Дизайн:** тема/цвета/шрифты — у хоста; хроматика грида (плотность, высоты) — у fequlib через CSS-переменные. Не дублировать тему продукта в библиотеке.

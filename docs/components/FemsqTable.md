@@ -4,6 +4,8 @@
 
 **Пакет:** `fequlib` · **импорт:** `import { FemsqTable, actionsColumn, type FemsqTableColumn } from 'fequlib'`
 
+**Визуал / распределение с хостом:** [design/FemsqTable-visual-target.md](../design/FemsqTable-visual-target.md) (тема продукта ≠ хроматика грида; DX — эталон плотности, не палитры).
+
 ## Контракт (фазы A–B + generic Row)
 
 | Принцип | Суть |
@@ -39,11 +41,22 @@ function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизиро�
 - Client: фильтрация внутри компонента. Server: значения уходят в `@request.columnFilters` (поле опционально; отсутствие = нет активных колоночных фильтров).
 - Кастомный `#header-cell-*` у родителя перекрывает встроенный UI фильтра для этой колонки.
 
+## Дизайн: что в lib, что в хосте
+
+| В fequlib | В приложении-потребителе |
+|-----------|-------------------------|
+| Контракт filter/sort/columnFilters | Тема (light/dark), цвета, шрифты |
+| Метрики `--fequlib-table-*` (высоты, padding) — задача **0011** | Переопределение тех же токенов под продукт |
+| Раскладка filter-row / sticky header | Chrome (TopBar/StatusBar), Quasar brand |
+
+Не хардкодить бренд-цвета в lib. Эталоны DX: `docs/assets/devexpress-grid/`.
+
 ## Границы
 
 - **Group By** — группировка плоских строк по колонке (фаза D).
 - **Иерархия** (TreeList) — не этот компонент.
 - **Filter Editor** (фаза F) — не этот MVP.
+- **Тема продукта** — не fequlib (см. visual-target).
 
 ## Потребители (FEMSQ)
 

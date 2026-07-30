@@ -10,6 +10,13 @@ Quasar UI Kit / библиотека компонентов для FEMSQ и см
 - Markdown в `docs/` — объяснения и планы; **задачи** — в docs-registry (`npm run cli` в `/home/alex/projects/docs-registry`), проект `fequlib`. Не заводить локальный `project-development.json`.
 - TreeList (иерархия) — отдельный будущий компонент, не режим `FemsqTable`.
 
+## Дизайн (хост ↔ библиотека)
+- **Тема продукта** (цвета, шрифты, light/dark, chrome) — у приложения-потребителя; fequlib **не** заводит свою копию Kimbie/VS.
+- **Хроматика грида** (плотность, высоты строки/шапки/filter-row, padding) — у fequlib через `--fequlib-table-*`; хост может переопределить.
+- Цвета в компонентах: `inherit` / Quasar / `var(--femsq-…, fallback)` — без хардкода бренд-`#hex`.
+- DevExpress-скрины в `docs/assets/devexpress-grid/` — эталон **плотности/паттернов**, не пиксель-копия и не палитра FEMSQ.
+- Бриф: `docs/design/FemsqTable-visual-target.md`.
+
 ## Стек
 - Vue 3 + Quasar 2 + TypeScript
 - Сейчас: plain package (`src/` + `types/`), не App Extension — App Extension при появлении 2-го потребителя.
@@ -17,6 +24,7 @@ Quasar UI Kit / библиотека компонентов для FEMSQ и см
 ## Документация
 - Оглавление: `docs/README.md`
 - Компонент: `docs/components/FemsqTable.md`
+- Визуал: `docs/design/FemsqTable-visual-target.md`
 - Roadmap: `docs/roadmap.md`
 - Планы: `docs/development/notes/chats/chat-plan/`
 
@@ -26,4 +34,5 @@ Quasar UI Kit / библиотека компонентов для FEMSQ и см
 - FEMSQ: `/home/alex/projects/femsq` (потребитель `file:../../../feQuLib`)
 
 **Создано:** 2026-07-28  
-**Версия:** 0.1.0
+**Последнее обновление:** 2026-07-29  
+**Версия:** 0.1.1
