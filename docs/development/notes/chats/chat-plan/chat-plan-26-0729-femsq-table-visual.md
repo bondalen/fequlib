@@ -1,12 +1,13 @@
 # План: визуальный контракт FemsqTable (хост ↔ fequlib)
 
 **Дата создания:** 2026-07-29  
-**Последнее обновление:** 2026-07-29  
+**Последнее обновление:** 2026-08-08  
 **Проект:** feQuLib  
-**Версия плана:** 0.1.0  
-**Статус:** 🔄 бриф принят; ожидает скрины DX + задача registry  
+**Версия плана:** 0.1.1  
+**Статус:** 🔄 бриф принят; ожидает скрины DX; **0011** расширен sticky (см. gaps SUDZ)  
 **Бриф:** [FemsqTable-visual-target.md](../../../design/FemsqTable-visual-target.md)  
-**Связь FEMSQ:** `chat-plan-26-0725-femsq-table.md` §8; `02-8_femsq-table-component.md`
+**Связь FEMSQ:** `chat-plan-26-0725-femsq-table.md` §8; `02-8_femsq-table-component.md`  
+**Gaps wide preview:** [chat-plan-26-0808-sudz-gaps.md](./chat-plan-26-0808-sudz-gaps.md)
 
 ## 0. Зачем
 
@@ -38,9 +39,13 @@
 ### V1 — Токены и скин в fequlib ⬜
 
 - [ ] CSS-переменные `--fequlib-table-*` с дефолтами (плотность ближе к DX-эталону)
+- [ ] **Sticky header + sticky filter-row** внутри viewport (обязательный deliverable **0011**, не только высоты)
+- [ ] Согласование sticky с границами колонок (не `border-collapse: collapse` без фикса)
 - [ ] Без хардкода бренд-цветов; inherit / Quasar / `var(--femsq-…, fallback)`
 - [ ] Краткая секция в `FemsqTable.md` «токены хоста»
 - [ ] Smoke на FEMSQ перечень строек (light + dark)
+
+Смежные задачи wide preview (**0012–0014**) и notify FEMSQ (**0015**) — [chat-plan-26-0808-sudz-gaps.md](./chat-plan-26-0808-sudz-gaps.md).
 
 ### V2 — Хост FEMSQ ⬜
 

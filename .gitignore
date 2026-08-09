@@ -2,3 +2,8 @@ node_modules/
 dist/
 *.log
 .DS_Store
+
+# DBHub MCP (локально; DSN с паролем)
+.cursor/mcp.json
+.cursor/dbhub/node_modules/
+.cursor/dbhub/package-lock.json
