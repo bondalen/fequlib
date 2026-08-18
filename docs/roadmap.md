@@ -11,6 +11,7 @@
 - [x] Generic `Row` / `FemsqTableColumn<Row>` (задача 0003; без `as unknown as Record…`)
 - [x] Docs: known gaps СУДЗ + backlog **0011–0015** (2026-08-08; код — отдельно)
 - [x] docs-registry канон на VPS (`10.7.0.1`); локальный `docs-registry-pg` снят (2026-08-09, M0–M6)
+- [x] `FemsqTree` v1: nested outline + H1 на FEMSQ `sudz-sf-double` (задача **0016**, 2026-08-18)
 
 ## Backlog (задачи в registry)
 
@@ -24,7 +25,7 @@
 | **0013** | Multiline / wrap заголовков (2–3 строки, clamp) | medium |
 | **0014** | `@cell-click` API `(row, column, value/text)` | medium |
 | **0015** | Уведомить FEMSQ (СУДЗ Rslt preview) после 0011–0014 | medium |
-| **0016** | **`FemsqTree` v1: nested outline, header/detail, lazy** | **high** |
+| 0016 | `FemsqTree` v1 (nested outline, H1 `sudz-sf-double`) | ~~high~~ **done** |
 | 0006 | Фаза C: аудит остальных гридов потребителей | low |
 | 0007 | Фаза D: Group By (плоские строки) | low |
 | 0008 | Фазы E–G: column chooser / Filter Editor / server-side точечно | low |
@@ -42,8 +43,7 @@ Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/c
 1. **0011 + 0012** вместе (sticky бесполезен без viewport containment в flex-хосте).  
 2. **0013**, **0014** — для возврата Rslt preview на FemsqTable.  
 3. **0015** — обязательный ping FEMSQ с версией/коммитом fequlib.  
-4. **0016** — параллельный трек (`FemsqTree`); не смешивать с визуалом грида.  
-5. Инфра registry: при сбое CLI — WG, потом `docker start fedoc-postgres-age`; не локальный `:5433`.
+4. Инфра registry: при сбое CLI — WG, потом `docker start fedoc-postgres-age`; не локальный `:5433`.
 
 ## Future (не сейчас)
 

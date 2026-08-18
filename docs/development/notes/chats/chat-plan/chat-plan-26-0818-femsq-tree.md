@@ -3,8 +3,8 @@
 **Дата создания:** 2026-08-18  
 **Последнее обновление:** 2026-08-18  
 **Проект:** feQuLib  
-**Версия плана:** 0.1.0  
-**Статус:** 🔄 D0 (docs + registry) выполнен в этом шаге; реализация не начата  
+**Версия плана:** 0.3.0  
+**Статус:** ✅ D0–D4 + H1 (`sudz-sf-double`); задача **0016** закрыта  
 **Контракт:** [FemsqTree.md](../../../components/FemsqTree.md)  
 **Задача registry:** **0016** (проект `fequlib`)  
 **Связь FEMSQ:** экран `sudz-sf-double` (правый нижний блок); обмен `agent-exchange/femsq-fequlib/`  
@@ -53,36 +53,36 @@ FEMSQ нужен универсальный nested-tree (заголовок / д
 - [x] Задача docs-registry **0016** (проект `fequlib`)
 - [x] Exchange-ответ FEMSQ (после D0, до кода)
 
-### D1 — Чистые функции ⬜
+### D1 — Чистые функции ✅
 
-- [ ] `src/components/tree/femsq-tree.ts`: `getNodeKey`, `getChildren`, `isLeaf`, `shouldLoad`
-- [ ] `src/components/tree/femsq-tree.test.ts` (Vitest node)
-- [ ] `npm test` зелёный
+- [x] `src/components/tree/femsq-tree.ts`: `getNodeKey`, `getChildren`, `isLeaf`, `shouldLoad`
+- [x] `src/components/tree/femsq-tree.test.ts` (Vitest node)
+- [x] `npm test` зелёный
 
-### D2 — Vue SFC ⬜
+### D2 — Vue SFC ✅
 
-- [ ] `FemsqTree.vue` (корень, v-model, empty/loading корня, проброс слотов)
-- [ ] `FemsqTreeNode.vue` (`name: 'FemsqTreeNode'`, рекурсия + явный проброс слотов)
-- [ ] семантика selected vs expanded vs leaf vs lazy — как в контракте
-- [ ] `--fequlib-tree-*` в scoped CSS; Quasar-примитивы (`QBtn`, `QSpinner`), не `QTree`
+- [x] `FemsqTree.vue` (корень, v-model, empty/loading корня, проброс слотов)
+- [x] `FemsqTreeNode.vue` (`name: 'FemsqTreeNode'`, рекурсия + явный проброс слотов)
+- [x] семантика selected vs expanded vs leaf vs lazy — как в контракте
+- [x] `--fequlib-tree-*` в scoped CSS; Quasar-примитивы (`QBtn`, `QSpinner`), не `QTree`
 
-### D3 — Публичный экспорт ⬜
+### D3 — Публичный экспорт ✅
 
-- [ ] `src/index.ts` — `FemsqTree` + типы/хелперы
-- [ ] `types/index.d.ts` — рукописные декларации (как у таблицы)
-- [ ] `npm run typecheck` зелёный
+- [x] `src/index.ts` — `FemsqTree` + типы/хелперы
+- [x] `types/index.d.ts` — рукописные декларации (как у таблицы)
+- [x] `npm run typecheck` зелёный
 
-### D4 — Синхронизация docs после кода ⬜
+### D4 — Синхронизация docs после кода ✅
 
-- [ ] сверить `FemsqTree.md` с фактическим API
-- [ ] отметить исполненное в этом плане
-- [ ] при необходимости `task update --status` для 0016 (не закрывать до smoke на хосте)
+- [x] сверить `FemsqTree.md` с фактическим API
+- [x] отметить исполненное в этом плане
+- [x] `task update` описания **0016** (закрыта после H1, 2026-08-18)
 
-### H1 — Хост FEMSQ (не этот репозиторий) ⬜
+### H1 — Хост FEMSQ (не этот репозиторий) ✅
 
-- подключить `FemsqTree` на `sudz-sf-double` вместо нижней карточки `QMarkupTable`
-- хост владеет `nodes` / `@load` / составными ключами
-- оценка: нужен ли позже колоночный TreeList для «Договоры» / агентов
+- [x] подключить `FemsqTree` на `sudz-sf-double` (предварительный smoke 2026-08-18, `upl=910` / `inv=85069`)
+- [x] полный smoke: наполнение узлов vs БД (стороны / СГК / ДЗ) — хост; расхождений lib нет
+- [ ] оценка: нужен ли позже колоночный TreeList для «Договоры» / агентов — не этот план; FEMSQ обратится отдельно
 
 ## 4. Порядок реализации
 
@@ -96,13 +96,13 @@ FEMSQ нужен универсальный nested-tree (заголовок / д
 
 ## 5. Критерии готовности v1 (lib)
 
-- [ ] Контракт в `docs/components/FemsqTree.md` совпадает с кодом
-- [ ] Экспорт `import { FemsqTree } from 'fequlib'`
-- [ ] `npm test` и `npm run typecheck` без регрессии таблицы
-- [ ] Default: `expandOnClick=false`; detail по `selectedKey`; дети по `expandedKeys`
-- [ ] `@load` только при `lazy` + не leaf + `children === undefined`
-- [ ] Нет доменных типов FEMSQ в lib
-- [ ] Задача **0016** обновлена по статусу; закрытие — после smoke H1 или по договорённости с хостом
+- [x] Контракт в `docs/components/FemsqTree.md` совпадает с кодом
+- [x] Экспорт `import { FemsqTree } from 'fequlib'`
+- [x] `npm test` и `npm run typecheck` без регрессии таблицы
+- [x] Default: `expandOnClick=false`; detail по `selectedKey`; дети по `expandedKeys`
+- [x] `@load` только при `lazy` + не leaf + `children === undefined`
+- [x] Нет доменных типов FEMSQ в lib
+- [x] Задача **0016** закрыта после smoke H1 на `sudz-sf-double` (2026-08-18)
 
 ## 6. Связь с FEMSQ
 
@@ -118,6 +118,8 @@ FEMSQ нужен универсальный nested-tree (заголовок / д
 | Когда | Что |
 |---|---|
 | 2026-08-18 | D0: план, контракт, roadmap, README, registry **0016**. Код Tree не писался. |
+| 2026-08-18 | D1–D4: runtime `FemsqTree` + тесты хелперов + экспорт/types. **0016** не закрыта (ждём H1). |
+| 2026-08-18 | H1 финал: сверка узлов с БД ок; правок runtime нет; **0016** → completed. |
 
 **Автор:** Cursor AI + Александр  
 **Создано:** 2026-08-18

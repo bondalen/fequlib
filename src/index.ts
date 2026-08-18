@@ -15,3 +15,16 @@ export {
   type FemsqTableRequest,
   type FemsqTableRowBase
 } from './components/table/femsq-table';
+export { default as FemsqTree } from './components/tree/FemsqTree.vue';
+export {
+  getChildren,
+  getLoadReason,
+  getNodeKey,
+  isLeaf,
+  shouldLoad,
+  type FemsqTreeKey,
+  type FemsqTreeLoadPayload,
+  type FemsqTreeLoadReason,
+  type FemsqTreeNodeBase,
+  type FemsqTreeNodeKey
+} from './components/tree/femsq-tree';

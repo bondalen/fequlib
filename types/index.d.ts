@@ -124,4 +124,60 @@ export declare function normalizeColumnFilters(
   columnFilters: Record<string, string> | undefined | null
 ): Record<string, string> | undefined;
 
+export type FemsqTreeNodeBase = Record<string, any>;
+
+export type FemsqTreeKey = string | number;
+
+export type FemsqTreeNodeKey<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> =
+  | string
+  | ((node: Node) => FemsqTreeKey);
+
+export type FemsqTreeLoadReason = 'expand' | 'retry';
+
+export interface FemsqTreeLoadPayload<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
+  node: Node;
+  key: FemsqTreeKey;
+  reason: FemsqTreeLoadReason;
+}
+
+export interface FemsqTreeProps<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
+  nodes: readonly Node[];
+  nodeKey: FemsqTreeNodeKey<Node>;
+  childrenKey?: string;
+  leafKey?: string;
+  expandedKeys?: FemsqTreeKey[];
+  selectedKey?: FemsqTreeKey | null;
+  loadingKeys?: FemsqTreeKey[];
+  indent?: number;
+  expandOnClick?: boolean;
+  selectable?: boolean;
+  lazy?: boolean;
+  rootClass?: string;
+}
+
+export declare const FemsqTree: <Node extends FemsqTreeNodeBase = FemsqTreeNodeBase>(
+  props: FemsqTreeProps<Node> & Record<string, unknown>
+) => any;
+
+export declare function getNodeKey<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  nodeKey: FemsqTreeNodeKey<Node>
+): FemsqTreeKey;
+
+export declare function getChildren<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  childrenKey?: string
+): Node[] | undefined;
+
+export declare function isLeaf<Node extends FemsqTreeNodeBase>(node: Node, leafKey?: string): boolean;
+
+export declare function shouldLoad<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  lazy: boolean,
+  childrenKey?: string,
+  leafKey?: string
+): boolean;
+
+export declare function getLoadReason(alreadyRequested: boolean): FemsqTreeLoadReason;
+
 export {};

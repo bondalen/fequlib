@@ -1,6 +1,6 @@
 # feQuLib
 
-Quasar UI Kit для FEMSQ и смежных проектов. Компоненты: `FemsqTable` (есть), `FemsqTree` (контракт v1, задача **0016**).
+Quasar UI Kit для FEMSQ и смежных проектов. Компоненты: `FemsqTable`, `FemsqTree` (v1, задача **0016**).
 
 **Репозиторий:** https://github.com/bondalen/fequlib  
 **npm-пакет:** `fequlib`
@@ -20,7 +20,7 @@ Quasar UI Kit для FEMSQ и смежных проектов. Компонен�
 ## Использование
 
 ```ts
-import { FemsqTable, actionsColumn, type FemsqTableColumn } from 'fequlib';
+import { FemsqTable, FemsqTree, actionsColumn, type FemsqTableColumn } from 'fequlib';
 ```
 
 ## Тесты и проверка типов

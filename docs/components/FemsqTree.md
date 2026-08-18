@@ -5,9 +5,9 @@
 **Пакет:** `fequlib` · **импорт:** `import { FemsqTree } from 'fequlib'`  
 **План:** [chat-plan-26-0818-femsq-tree.md](../development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md)  
 **Задача registry:** **0016**  
-**Статус:** контракт v1 зафиксирован; runtime ещё не реализован
+**Статус:** v1 закрыт (H1 `sudz-sf-double`, задача **0016** done)
 
-**Дизайн хост ↔ lib:** тема/цвета/шрифты — у потребителя; плотность и indent — `--fequlib-tree-*`. Без бренд-`#hex` в lib. Не зависит от задачи **0011** (`FemsqTable`).
+**Дизайн хост ↔ lib:** тема/цвета/шрифты — у потребителя; плотность и indent — `--fequlib-tree-*` (`--fequlib-tree-indent`, `--fequlib-tree-row-height`, `--fequlib-tree-row-padding-x` / `-y`). Без бренд-`#hex` в lib. Не зависит от задачи **0011** (`FemsqTable`).
 
 ## Контракт v1
 
@@ -112,8 +112,9 @@ Controlled + uncontrolled: если родитель не передал `expand
 
 | Где | Условие | Слот |
 |---|---|---|
-| корень | `nodes.length === 0`, не loading | `#empty` без `node` |
-| корень / узел | ключ ∈ `loadingKeys` | `#loading` |
+| корень | `nodes.length === 0` и `loadingKeys.length > 0` | `#loading` без `node` |
+| корень | `nodes.length === 0`, нет loading | `#empty` без `node` |
+| узел | ключ ∈ `loadingKeys` | `#loading` |
 | раскрытый узел | не loading, не leaf, `children.length === 0` | `#empty` с `{ node, key, depth }` |
 
 Нет `#loading` → default `QSpinner` / `:loading` на toggle. Нет `#empty` → нейтральная пустая строка без доменного текста.
@@ -163,16 +164,17 @@ Controlled + uncontrolled: если родитель не передал `expand
 
 Хост в `@load` дописывает `payload.node.children` (или заменяет `nodes` иммутабельно — оба варианта ок, если дерево реактивно).
 
-## Файлы реализации (ещё не созданы)
+## Файлы реализации
 
 ```
 src/components/tree/FemsqTree.vue
 src/components/tree/FemsqTreeNode.vue
 src/components/tree/femsq-tree.ts
 src/components/tree/femsq-tree.test.ts
+src/components/tree/femsq-tree-context.ts
 ```
 
-Плюс экспорт в `src/index.ts` и декларации в `types/index.d.ts`.
+Плюс экспорт в `src/index.ts` и декларации в `types/index.d.ts`. Хелперы: `getNodeKey`, `getChildren`, `isLeaf`, `shouldLoad`, `getLoadReason`.
 
 ## Границы v1
 
@@ -184,7 +186,7 @@ src/components/tree/femsq-tree.test.ts
 
 | Форма | Файл | Статус |
 |---|---|---|
-| СУДЗ · разбор СФ с совпадающими номерами | `SudzSfDoubleView.vue` | первый; runtime lib ещё нет |
+| СУДЗ · разбор СФ с совпадающими номерами | `SudzSfDoubleView.vue` | H1 закрыт (2026-08-18) |
 | Договоры · стороны | `ContractPartiesPanel.vue` | не v1 (скорее TreeList / слоты позже) |
 
 Целевой UX SUDZ: FEMSQ `docs/development/notes/chats/chat-plan/sudz-sf-double-tree.md`.
