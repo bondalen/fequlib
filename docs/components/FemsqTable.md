@@ -55,7 +55,7 @@ function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизиро�
 ## Границы
 
 - **Group By** — группировка плоских строк по колонке (фаза D).
-- **Иерархия** (TreeList) — не этот компонент.
+- **Иерархия** — не этот компонент. Nested outline: [`FemsqTree`](./FemsqTree.md) (v1). Колоночный TreeList — отдельно, позже.
 - **Filter Editor** (фаза F) — не этот MVP.
 - **Тема продукта** — не fequlib (см. visual-target).
 

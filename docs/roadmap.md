@@ -24,12 +24,14 @@
 | **0013** | Multiline / wrap заголовков (2–3 строки, clamp) | medium |
 | **0014** | `@cell-click` API `(row, column, value/text)` | medium |
 | **0015** | Уведомить FEMSQ (СУДЗ Rslt preview) после 0011–0014 | medium |
+| **0016** | **`FemsqTree` v1: nested outline, header/detail, lazy** | **high** |
 | 0006 | Фаза C: аудит остальных гридов потребителей | low |
 | 0007 | Фаза D: Group By (плоские строки) | low |
 | 0008 | Фазы E–G: column chooser / Filter Editor / server-side точечно | low |
 | 0009 | Упаковка Quasar App Extension (когда ≥2 потребителя) | low |
 
-План визуала: [chat-plan-26-0729-femsq-table-visual.md](./development/notes/chats/chat-plan/chat-plan-26-0729-femsq-table-visual.md) · бриф [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md).
+План визуала: [chat-plan-26-0729-femsq-table-visual.md](./development/notes/chats/chat-plan/chat-plan-26-0729-femsq-table-visual.md) · бриф [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md).  
+План дерева: [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) · контракт [components/FemsqTree.md](./components/FemsqTree.md).
 
 Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md) · секция в [FemsqTable.md](./components/FemsqTable.md).
 
@@ -40,11 +42,12 @@ Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/c
 1. **0011 + 0012** вместе (sticky бесполезен без viewport containment в flex-хосте).  
 2. **0013**, **0014** — для возврата Rslt preview на FemsqTable.  
 3. **0015** — обязательный ping FEMSQ с версией/коммитом fequlib.  
-4. Инфра registry: при сбое CLI — WG, потом `docker start fedoc-postgres-age`; не локальный `:5433`.
+4. **0016** — параллельный трек (`FemsqTree`); не смешивать с визуалом грида.  
+5. Инфра registry: при сбое CLI — WG, потом `docker start fedoc-postgres-age`; не локальный `:5433`.
 
 ## Future (не сейчас)
 
-- `FemsqTreeList` — отдельный компонент, отдельное обоснование.
+- `FemsqTreeList` — колоночное дерево (агенты / стороны договора); отдельное обоснование, не режим `FemsqTree` v1.
 
 ## Принцип
 

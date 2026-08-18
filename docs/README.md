@@ -3,6 +3,7 @@
 | Документ | Назначение |
 |---|---|
 | [components/FemsqTable.md](./components/FemsqTable.md) | Контракт `FemsqTable` (функционал + known gaps) |
+| [components/FemsqTree.md](./components/FemsqTree.md) | Контракт `FemsqTree` v1 (nested outline) |
 | [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md) | Распределение дизайна хост↔lib; DX как эталон хроматики |
 | [assets/devexpress-grid/](./assets/devexpress-grid/) | Скрины-эталоны DevExpress (плотность / filter row) |
 | [roadmap.md](./roadmap.md) | Фазы, backlog, итоги инфраструктуры |
@@ -10,6 +11,7 @@
 | [development/notes/chats/chat-resume/](./development/notes/chats/chat-resume/) | Краткие резюме чатов |
 | [chat-plan-26-0808-sudz-gaps.md](./development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md) | Gaps wide preview (FEMSQ СУДЗ) → 0011–0015 |
 | [chat-plan-26-0809-docs-registry-vps.md](./development/notes/chats/chat-plan/chat-plan-26-0809-docs-registry-vps.md) | docs-registry → VPS (M0–M6 ✅) |
+| [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) | `FemsqTree` v1 (задача **0016**) |
 | [chat-resume-26-0809-sudz-gaps-registry-vps.md](./development/notes/chats/chat-resume/chat-resume-26-0809-sudz-gaps-registry-vps.md) | Резюме чата 2026-08-08…09 |
 
 ## Итоги (2026-08-09)

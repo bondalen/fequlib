@@ -1,6 +1,6 @@
 # feQuLib
 
-Quasar UI Kit для FEMSQ и смежных проектов. Первый компонент — `FemsqTable`.
+Quasar UI Kit для FEMSQ и смежных проектов. Компоненты: `FemsqTable` (есть), `FemsqTree` (контракт v1, задача **0016**).
 
 **Репозиторий:** https://github.com/bondalen/fequlib  
 **npm-пакет:** `fequlib`

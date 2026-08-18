@@ -9,7 +9,7 @@ Quasar UI Kit / библиотека компонентов для FEMSQ и см
 - Не тащить доменную логику FEMSQ (стройки, отчёты) в библиотеку — только UI-контракты.
 - Markdown в `docs/` — объяснения и планы; **задачи** — в docs-registry (`npm run cli` в `/home/alex/projects/docs-registry`), проект `fequlib`. Не заводить локальный `project-development.json`.
 - Канон docs-registry: Postgres на VPS WG **`10.7.0.1:5432`**, DB `docs_registry` (не локальный `:5433`). Туннель `nb-win-cloud-ru`. При сбое: WG → при необходимости `docker start fedoc-postgres-age` на VPS.
-- TreeList (иерархия) — отдельный будущий компонент, не режим `FemsqTable`.
+- Иерархия — не режим `FemsqTable`. `FemsqTree` (nested outline, задача **0016**) — отдельный компонент. Колоночный `FemsqTreeList` — позже, отдельное обоснование.
 
 ## Дизайн (хост ↔ библиотека)
 - **Тема продукта** (цвета, шрифты, light/dark, chrome) — у приложения-потребителя; fequlib **не** заводит свою копию Kimbie/VS.
@@ -24,7 +24,7 @@ Quasar UI Kit / библиотека компонентов для FEMSQ и см
 
 ## Документация
 - Оглавление: `docs/README.md`
-- Компонент: `docs/components/FemsqTable.md`
+- Компоненты: `docs/components/FemsqTable.md`, `docs/components/FemsqTree.md`
 - Визуал: `docs/design/FemsqTable-visual-target.md`
 - Roadmap: `docs/roadmap.md`
 - Планы: `docs/development/notes/chats/chat-plan/`
@@ -36,5 +36,5 @@ Quasar UI Kit / библиотека компонентов для FEMSQ и см
 - FEMSQ: `/home/alex/projects/femsq` (потребитель `file:../../../feQuLib`)
 
 **Создано:** 2026-07-28  
-**Последнее обновление:** 2026-08-09  
+**Последнее обновление:** 2026-08-18  
 **Версия:** 0.1.2
