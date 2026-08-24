@@ -41,7 +41,10 @@
 
 ## 5. Коммит / ветка
 
-После commit+push на `main` fequlib: `git pull` в `/home/alex/projects/feQuLib` (или `file:`-зависимость FEMSQ). Этот ответ пишется до push — хост сверит SHA в сообщении коммита / PR.
+После commit+push на `main` fequlib: `git pull` в `/home/alex/projects/feQuLib` (или `file:`-зависимость FEMSQ).
+
+**SHA:** `0f53376` — `feat: add fill layout and toggle-selected for table and tree.`  
+Репозиторий: https://github.com/bondalen/fequlib
 
 **0012** не закрываем целиком: срез fill (V-scroll в splitter) готов; H-scroll / wide Rslt — отдельно.
 
