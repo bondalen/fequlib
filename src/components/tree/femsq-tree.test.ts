@@ -8,6 +8,7 @@ import {
   keyListIncludes,
   shouldLoad,
   toggleKeyInList,
+  toggleSelectedKey,
   type FemsqTreeNodeBase
 } from './femsq-tree';
 
@@ -101,5 +102,18 @@ describe('keyListIncludes / toggleKeyInList', () => {
     expect(toggleKeyInList(src, 'a', true)).toEqual(['a']);
     expect(toggleKeyInList(src, 'c', false)).toEqual(['a']);
     expect(src).toEqual(['a']);
+  });
+});
+
+describe('toggleSelectedKey', () => {
+  it('returns null when clicked on already-selected key', () => {
+    expect(toggleSelectedKey('a', 'a')).toBeNull();
+    expect(toggleSelectedKey(1, 1)).toBeNull();
+  });
+
+  it('returns clicked key when selection differs (or is nullish)', () => {
+    expect(toggleSelectedKey(null, 'a')).toBe('a');
+    expect(toggleSelectedKey(undefined, 2)).toBe(2);
+    expect(toggleSelectedKey('a', 'b')).toBe('b');
   });
 });

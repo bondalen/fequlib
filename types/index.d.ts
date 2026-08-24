@@ -57,6 +57,11 @@ export interface FemsqTableProps<Row extends FemsqTableRowBase = FemsqTableRowBa
   filterIcon?: string;
   filterTestId?: string;
   rootClass?: string;
+  /**
+   * Fill parent height; scroll body in `.q-table__middle`. Default false.
+   * Slice of registry **0012** (viewport containment in flex/splitter).
+   */
+  fill?: boolean;
   pagination?: {
     sortBy?: string | null;
     descending?: boolean;
@@ -153,6 +158,11 @@ export interface FemsqTreeProps<Node extends FemsqTreeNodeBase = FemsqTreeNodeBa
   selectable?: boolean;
   lazy?: boolean;
   rootClass?: string;
+  /**
+   * Fill parent height; scroll outline in `.femsq-tree__nodes` (incl. `#detail`).
+   * Default false. Same contract as FemsqTable `fill` (slice of **0012**).
+   */
+  fill?: boolean;
 }
 
 export declare const FemsqTree: <Node extends FemsqTreeNodeBase = FemsqTreeNodeBase>(

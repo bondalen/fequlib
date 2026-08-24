@@ -1,10 +1,10 @@
 # План: FemsqTree v1
 
 **Дата создания:** 2026-08-18  
-**Последнее обновление:** 2026-08-18  
+**Последнее обновление:** 2026-08-24 (post-H1: toggle selected; fill-layout срез **0012**)  
 **Проект:** feQuLib  
-**Версия плана:** 0.3.0  
-**Статус:** ✅ D0–D4 + H1 (`sudz-sf-double`); задача **0016** закрыта  
+**Версия плана:** 0.3.2  
+**Статус:** ✅ D0–D4 + H1 (`sudz-sf-double`); задача **0016** закрыта; UX toggle selected + `fill` — уточнения контракта v1, не новая фаза  
 **Контракт:** [FemsqTree.md](../../../components/FemsqTree.md)  
 **Задача registry:** **0016** (проект `fequlib`)  
 **Связь FEMSQ:** экран `sudz-sf-double` (правый нижний блок); обмен `agent-exchange/femsq-fequlib/`  
@@ -100,6 +100,7 @@ FEMSQ нужен универсальный nested-tree (заголовок / д
 - [x] Экспорт `import { FemsqTree } from 'fequlib'`
 - [x] `npm test` и `npm run typecheck` без регрессии таблицы
 - [x] Default: `expandOnClick=false`; detail по `selectedKey`; дети по `expandedKeys`
+- [x] Header-click при `selectable` переключает `selectedKey` (повторный клик → `null`, `#detail` скрыт) — post-H1, 2026-08-24
 - [x] `@load` только при `lazy` + не leaf + `children === undefined`
 - [x] Нет доменных типов FEMSQ в lib
 - [x] Задача **0016** закрыта после smoke H1 на `sudz-sf-double` (2026-08-18)
@@ -120,6 +121,8 @@ FEMSQ нужен универсальный nested-tree (заголовок / д
 | 2026-08-18 | D0: план, контракт, roadmap, README, registry **0016**. Код Tree не писался. |
 | 2026-08-18 | D1–D4: runtime `FemsqTree` + тесты хелперов + экспорт/types. **0016** не закрыта (ждём H1). |
 | 2026-08-18 | H1 финал: сверка узлов с БД ок; правок runtime нет; **0016** → completed. |
+| 2026-08-24 | Post-H1 уточнение UX: повторный header-click по выбранному узлу → `selectedKey = null`, `#detail` сворачивается. Не новая фаза; API не расширяли. Код: `toggleSelectedKey` + `onHeaderClick`. Docs: `FemsqTree.md`. Exchange: `2026-08-24_1102_femsq_to_fequlib_docs-femsq-tree-toggle-selected.md`. |
+| 2026-08-24 | Срез **0012** fill-layout: prop `fill` (default false) — дерево заполняет родителя, скролл в `.femsq-tree__nodes`. Exchange: `2026-08-24_1315_femsq_to_fequlib_fill-layout-table-and-tree.md`. Хост снимает `.relation-tree-scroll` после `fill`. |
 
 **Автор:** Cursor AI + Александр  
 **Создано:** 2026-08-18

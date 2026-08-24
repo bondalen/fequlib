@@ -1,5 +1,10 @@
 <template>
-  <div class="femsq-tree" :class="rootClassList" :style="rootStyle" v-bind="rootAttrs">
+  <div
+    class="femsq-tree"
+    :class="[rootClassList, { 'femsq-tree--fill': fill }]"
+    :style="rootStyle"
+    v-bind="rootAttrs"
+  >
     <div v-if="showRootLoading" class="femsq-tree__status">
       <slot name="loading" :depth="0">
         <QSpinner color="primary" size="1.25em" />
@@ -34,6 +39,7 @@ import {
   keyListIncludes,
   shouldLoad,
   toggleKeyInList,
+  toggleSelectedKey,
   type FemsqTreeKey,
   type FemsqTreeLoadPayload,
   type FemsqTreeNodeKey
@@ -58,6 +64,12 @@ const props = withDefaults(
     selectable?: boolean;
     lazy?: boolean;
     rootClass?: string;
+    /**
+     * Fill-layout: заполнить высоту родителя; скролл в `.femsq-tree__nodes`
+     * (включая `#detail`). Default false — размер по контенту.
+     * При fill=true хост не ставит overflow:auto на обёртку (двойной скролл).
+     */
+    fill?: boolean;
   }>(),
   {
     childrenKey: 'children',
@@ -69,7 +81,8 @@ const props = withDefaults(
     expandOnClick: false,
     selectable: true,
     lazy: false,
-    rootClass: ''
+    rootClass: '',
+    fill: false
   }
 );
 
@@ -178,7 +191,7 @@ function onToggle(_evt: Event, node: Node, key: FemsqTreeKey): void {
 function onHeaderClick(evt: Event, node: Node, key: FemsqTreeKey): void {
   emit('node-click', evt, node, key);
   if (props.selectable) {
-    setSelectedKey(key);
+    setSelectedKey(toggleSelectedKey(selectedKeyModel.value, key));
   }
   if (props.expandOnClick) {
     onToggle(evt, node, key);
@@ -229,10 +242,24 @@ provide(femsqTreeContextKey, treeContext as FemsqTreeContext);
   color: inherit;
 }
 
+.femsq-tree--fill {
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .femsq-tree__nodes {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+.femsq-tree--fill .femsq-tree__nodes,
+.femsq-tree--fill .femsq-tree__status {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
 }
 
 .femsq-tree__status,

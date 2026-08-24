@@ -17,7 +17,7 @@
 | Ключ | обязательный prop `nodeKey`: `string` или `(node) => string \| number` |
 | Дети | `childrenKey` (default `'children'`) |
 | Лист | `leafKey` (default `'leaf'`); `true` = детей не бывает |
-| Detail | слот `#detail` у узла с `selectedKey === key` |
+| Detail | слот `#detail` у узла с `selectedKey === key`; при `selectedKey === null` слот скрыт |
 | Дети на экране | ключ ∈ `expandedKeys` |
 | Lazy | `@load`, если `lazy` и `children` ещё `undefined` |
 | Хост владеет данными | lib не копирует и не мутирует дерево за хоста |
@@ -56,17 +56,32 @@ type HostTreeNode = {
 | `childrenKey` | `string`, default `'children'` | поле детей |
 | `leafKey` | `string`, default `'leaf'` | признак листа |
 | `expandedKeys` | `Key[]` | v-model: какие **дети** видны |
-| `selectedKey` | `Key \| null` | v-model: какой узел выбран (detail) |
+| `selectedKey` | `Key \| null` | v-model: какой узел выбран (detail). Header-click **переключает**: другой узел выбирает его; повторный клик по уже выбранному → `null` |
 | `loadingKeys` | `Key[]` | v-model: спиннер на узле; lib сам не пишет |
 | `indent` | `number`, default `16` | px на уровень |
 | `expandOnClick` | `boolean`, default `false` | клик по header также раскрывает детей |
-| `selectable` | `boolean`, default `true` | клик по header выбирает узел |
+| `selectable` | `boolean`, default `true` | клик по header выбирает / снимает выбор (toggle). `false` — header не меняет `selectedKey` |
 | `lazy` | `boolean`, default `false` | не loaded + не leaf → `@load` |
 | `rootClass` | `string` | класс корня |
+| `fill` | `boolean`, default `false` | fill-layout: `height:100%`, скролл в `.femsq-tree__nodes` (срез **0012**) |
 
 Controlled + uncontrolled: если родитель не передал `expandedKeys` / `selectedKey` / `loadingKeys`, живёт внутренний state, события `update:*` всё равно эмитятся.
 
 `inheritAttrs: false`: class / `data-test` / aria — на корень.
+
+### Fill-layout (`fill`, срез **0012**)
+
+Тот же контракт, что у `FemsqTable.fill`: родитель задал ограниченный viewport → дерево заполняет его и **само** скроллит outline.
+
+- `fill=true`: корень `.femsq-tree--fill` (`height:100%`, `overflow:hidden`); единственный scroll-viewport — `.femsq-tree__nodes` (`overflow:auto`), **включая `#detail`**.
+- `fill=false` (default): высота по контенту.
+- При `fill` хост **не** ставит `overflow:auto` на обёртку (иначе двойной скролл). После включения `fill` в FEMSQ снимать `.relation-tree-scroll`.
+
+```vue
+<div class="fill-pane"><!-- height:100%; min-height:0; overflow:hidden -->
+  <FemsqTree fill :nodes="…" node-key="id" … />
+</div>
+```
 
 ## Selected vs expanded
 
@@ -77,16 +92,18 @@ Controlled + uncontrolled: если родитель не передал `expand
 
 - select не раскрывает детей; expand не выбирает узел;
 - отдельного `openKeys` нет;
-- один выбранный узел; раскрытых — сколько угодно.
+- один выбранный узел **или ни одного** (`selectedKey === null`); раскрытых — сколько угодно.
+
+Header-click **toggles selection** (при `selectable=true`): клик по другому узлу выбирает его, клик по тому же выбранному узлу снимает выбор (`selectedKey → null`) и скрывает `#detail`. Это поведение библиотеки, не workaround хоста. При `selectable=false` header не трогает `selectedKey`.
 
 Клики:
 
 | Жест | Поведение |
 |---|---|
 | toggle | только expand/collapse детей |
-| header | select (если `selectable`); expand только если `expandOnClick` |
+| header | если `selectable`: выбрать узел **или** снять выбор, если кликнули по уже выбранному (`selectedKey → null`, `#detail` скрывается); expand только если `expandOnClick` |
 
-Для `sudz-sf-double`: `expandOnClick=false` (это и default).
+Для `sudz-sf-double`: `expandOnClick=false` (это и default); повторный клик по той же ветви сворачивает табличную форму в `#detail`.
 
 ## Leaf / empty / lazy
 

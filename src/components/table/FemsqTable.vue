@@ -1,5 +1,5 @@
 <template>
-  <div class="femsq-table" :class="rootClass">
+  <div class="femsq-table" :class="[rootClass, { 'femsq-table--fill': fill }]">
     <div v-if="showFilter" class="femsq-table__toolbar row q-col-gutter-sm items-center q-mb-xs">
       <div class="col-12 col-sm-grow">
         <QInput
@@ -122,6 +122,12 @@ const props = withDefaults(
     filterTestId?: string;
     /** Доп. класс корневого контейнера. */
     rootClass?: string;
+    /**
+     * Fill-layout: заполнить высоту родителя и скроллить тело грида
+     * (`.q-table__middle`). Default false — размер по контенту (additive-first).
+     * Хост: ограничить родителя (flex/`height:100%`/`overflow:hidden`); не дублировать overflow-обёртку.
+     */
+    fill?: boolean;
     /** Пагинация QTable (v-model:pagination). */
     pagination?: QTableProps['pagination'];
   }>(),
@@ -137,6 +143,7 @@ const props = withDefaults(
     filterIcon: 'search',
     filterTestId: 'femsq-table-filter',
     rootClass: '',
+    fill: false,
     pagination: undefined
   }
 );
@@ -390,9 +397,39 @@ defineExpose({
   width: 100%;
 }
 
+.femsq-table--fill {
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.femsq-table--fill .femsq-table__toolbar {
+  flex: 0 0 auto;
+}
+
 .femsq-table__q-table {
   flex: 1 1 auto;
   min-height: 0;
+}
+
+.femsq-table--fill .femsq-table__q-table {
+  flex: 1 1 0;
+  min-width: 0;
+  max-height: 100%;
+}
+
+/* QTable card = column flex; bounded height → .q-table__middle.scroll scrolls body */
+.femsq-table--fill :deep(.q-table__container) {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.femsq-table--fill :deep(.q-table__middle) {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
 }
 
 .femsq-table__header-cell {

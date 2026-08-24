@@ -101,3 +101,14 @@ export function toggleKeyInList(
   }
   return has ? keys.filter((item) => item !== key) : [...keys];
 }
+
+/**
+ * Переключатель selectedKey: если кликнули по уже выбранному узлу —
+ * возвращаем `null`, чтобы хост мог скрыть `#detail`.
+ */
+export function toggleSelectedKey(
+  currentSelectedKey: FemsqTreeKey | null | undefined,
+  clickedKey: FemsqTreeKey
+): FemsqTreeKey | null {
+  return currentSelectedKey === clickedKey ? null : clickedKey;
+}

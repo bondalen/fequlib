@@ -23,7 +23,7 @@
 | Код | Тема | Связь |
 |-----|------|--------|
 | **0011** | Visual + sticky header/filter-row + границы колонок | было: токены; теперь + sticky |
-| **0012** | Wide-scroll / host viewport contract | containment, overflow |
+| **0012** | Wide-scroll / host viewport contract | containment, overflow; **срез `fill`** (2026-08-24) — V-scroll в splitter для Table+Tree; H-scroll/wide Rslt ещё открыт |
 | **0013** | Multiline header labels | prop / CSS token, clamp |
 | **0014** | `@cell-click` API | additive-first |
 | **0015** | Уведомить FEMSQ | после закрытия 0011–0014 |

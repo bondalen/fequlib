@@ -21,7 +21,7 @@
 | 0004 | Unit-тесты: cellText / filter / sort | ~~medium~~ **done** |
 | 0005 | Фаза B: поколоночные фильтры | ~~medium~~ **done** |
 | **0011** | **Visual + sticky: DX-эталоны, `--fequlib-table-*`, sticky header/filter-row** | **high** |
-| **0012** | **Wide-scroll / host viewport contract** (containment, overflow) | **high** |
+| **0012** | **Wide-scroll / host viewport contract** (containment, overflow); **срез fill** (2026-08-24): prop `fill` на Table+Tree | **high** |
 | **0013** | Multiline / wrap заголовков (2–3 строки, clamp) | medium |
 | **0014** | `@cell-click` API `(row, column, value/text)` | medium |
 | **0015** | Уведомить FEMSQ (СУДЗ Rslt preview) после 0011–0014 | medium |
@@ -40,7 +40,7 @@ Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/c
 
 ## Рекомендации (очередь)
 
-1. **0011 + 0012** вместе (sticky бесполезен без viewport containment в flex-хосте).  
+1. **0011 + 0012** вместе (sticky бесполезен без viewport containment в flex-хосте). Срез **`fill`** (Table+Tree) — уже в коде; остаток **0012** — H-scroll / wide Rslt.  
 2. **0013**, **0014** — для возврата Rslt preview на FemsqTable.  
 3. **0015** — обязательный ping FEMSQ с версией/коммитом fequlib.  
 4. Инфра registry: при сбое CLI — WG, потом `docker start fedoc-postgres-age`; не локальный `:5433`.

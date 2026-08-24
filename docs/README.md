@@ -3,7 +3,7 @@
 | Документ | Назначение |
 |---|---|
 | [components/FemsqTable.md](./components/FemsqTable.md) | Контракт `FemsqTable` (функционал + known gaps) |
-| [components/FemsqTree.md](./components/FemsqTree.md) | Контракт `FemsqTree` v1 (nested outline) |
+| [components/FemsqTree.md](./components/FemsqTree.md) | Контракт `FemsqTree` v1 (nested outline; header-click toggles `selectedKey`) |
 | [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md) | Распределение дизайна хост↔lib; DX как эталон хроматики |
 | [assets/devexpress-grid/](./assets/devexpress-grid/) | Скрины-эталоны DevExpress (плотность / filter row) |
 | [roadmap.md](./roadmap.md) | Фазы, backlog, итоги инфраструктуры |
@@ -12,6 +12,7 @@
 | [chat-plan-26-0808-sudz-gaps.md](./development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md) | Gaps wide preview (FEMSQ СУДЗ) → 0011–0015 |
 | [chat-plan-26-0809-docs-registry-vps.md](./development/notes/chats/chat-plan/chat-plan-26-0809-docs-registry-vps.md) | docs-registry → VPS (M0–M6 ✅) |
 | [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) | `FemsqTree` v1 (задача **0016**) |
+| [chat-plan-26-0824-fill-layout.md](./development/notes/chats/chat-plan/chat-plan-26-0824-fill-layout.md) | Срез **0012**: prop `fill` Table+Tree |
 | [chat-resume-26-0809-sudz-gaps-registry-vps.md](./development/notes/chats/chat-resume/chat-resume-26-0809-sudz-gaps-registry-vps.md) | Резюме чата 2026-08-08…09 |
 
 ## Итоги
@@ -40,7 +41,7 @@ npm run cli -- task list --project fequlib
 
 ## Рекомендации далее
 
-1. Реализация **0011** (sticky + токены) и **0012** (viewport) — приоритет high.  
+1. Реализация **0011** (sticky + токены) и остаток **0012** (H-scroll / wide) — приоритет high; срез **`fill`** (V-scroll в splitter) уже в lib.  
 2. Затем **0013** / **0014**; закрытие цепочки — **0015** (уведомить FEMSQ).  
 3. Additive-first: не ломать текущих потребителей списков.
 

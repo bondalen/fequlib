@@ -18,6 +18,7 @@
 | `mode: 'client' \| 'server'` | Server эмитит `@request` `{ filter, columnFilters?, sortBy, descending, page, rowsPerPage }` |
 | Глобальный фильтр | `v-model:filter` / `showFilter` — подстрока по всем `filterable`-колонкам |
 | Поколоночные фильтры (B) | Под заголовком у колонок с `filterable !== false`; `v-model:columnFilters`; AND с глобальным |
+| `fill` (срез **0012**) | Опционально: заполнить высоту родителя, скролл тела в `.q-table__middle`; default `false` |
 | Additive-first | Новые API только опциональные |
 
 ```ts
@@ -41,6 +42,26 @@ function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизиро�
 - Client: фильтрация внутри компонента. Server: значения уходят в `@request.columnFilters` (поле опционально; отсутствие = нет активных колоночных фильтров).
 - Кастомный `#header-cell-*` у родителя перекрывает встроенный UI фильтра для этой колонки.
 
+### Fill-layout (`fill`, срез **0012**)
+
+Опциональный boolean, **default `false`** (additive-first). Когда `true`:
+
+1. Корень `.femsq-table--fill`: `height: 100%`, `min-width: 0`, `overflow: hidden`.
+2. `QTable` занимает оставшуюся высоту под toolbar фильтра; скроллится **`.q-table__middle`** (шапка таблицы остаётся над телом — поведение Quasar card + bounded height).
+3. Без `fill` — размер по контенту (master-списки без сплиттера не схлопываются).
+
+Хост:
+
+```vue
+<div class="fill-pane"><!-- height:100%; min-height:0; overflow:hidden -->
+  <FemsqTable fill class="fit" :rows="…" :columns="…" :show-filter="false" />
+</div>
+```
+
+- `class="fit"` попадает на `QTable` (attrs) и помогает дотянуть карточку; **обязателен prop `fill`** на корне FemsqTable — одного `fit` недостаточно.
+- Не ставить вторую обёртку с `overflow: auto` вокруг таблицы при `fill` (двойной скролл).
+- Это **срез** задачи **0012** (viewport в flex/splitter), не полный wide Excel Rslt preview и не sticky/DX (**0011**).
+
 ## Дизайн: что в lib, что в хосте
 
 | В fequlib | В приложении-потребителе |
@@ -48,6 +69,7 @@ function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизиро�
 | Контракт filter/sort/columnFilters | Тема (light/dark), цвета, шрифты |
 | Метрики `--fequlib-table-*` + sticky header/filter-row — задача **0011** | Переопределение тех же токенов под продукт |
 | Viewport containment / wide scroll — **0012** | Flex-хост: `min-width: 0`, высота рамки |
+| **`fill`** (срез **0012**, 2026-08-24) | Родитель с ограниченной высотой (flex/splitter/`height:100%` + `overflow:hidden`); **не** дублировать `overflow:auto` на обёртке |
 | Multiline header / `@cell-click` — **0013**, **0014** | Chrome (TopBar/StatusBar), Quasar brand |
 
 Не хардкодить бренд-цвета в lib. Эталоны DX: `docs/assets/devexpress-grid/`.
@@ -77,7 +99,7 @@ function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизиро�
 
 | # | Потребность | Сейчас | Зачем (Rslt preview) | Задача |
 |---|-------------|---------|----------------------|--------|
-| 1 | **Viewport containment** + H/V scroll без раздувания родителей (`min-width: 0`, рамка с собственным overflow) | Нет контракта «wide grid in flex host» | Много колонок срезов Rslt | **0012** |
+| 1 | **Viewport containment** + H/V scroll без раздувания родителей (`min-width: 0`, рамка с собственным overflow) | Срез **`fill`** (2026-08-24): V-scroll в flex/splitter; H-scroll / wide Rslt — ещё открыто | Много колонок срезов Rslt | **0012** |
 | 2 | **Sticky header** (+ ideally sticky filter-row) внутри viewport | В visual-target заявлено; в CSS/коде sticky **нет** | Длинный список строк | **0011** |
 | 3 | **Multiline / wrap заголовков** (2–3 строки, clamp) | `.femsq-table__header-label { white-space: nowrap }` | Длинные подписи Excel (`2026. II-й квартал…`) | **0013** |
 | 4 | **`@cell-click`** (или эквивалент) с `(row, column, value/text)` | Только `@row-click`; ячейка — через `#body-cell-*` + свой click | Нижняя detail-панель текста ячейки | **0014** |

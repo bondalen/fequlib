@@ -13,7 +13,7 @@
 | **Примитивы Quasar** | Хост + Quasar | `$primary`, dark mode, типографика — то, что уже видит `QTable`/`QInput` |
 | **Контракт грида** | fequlib | filter, sort, columnFilters, slots, `mode`/`@request`, additive API |
 | **Хроматика грида** | fequlib | плотность, высоты строки/шапки/filter-row, padding ячеек, раскладка filter under header, **sticky header + sticky filter-row** |
-| **Viewport / wide scroll** | fequlib + хост | контракт containment (`min-width: 0`, overflow в рамке) — задача **0012**; sticky работает *внутри* этой рамки |
+| **Viewport / wide scroll** | fequlib + хост | задача **0012**; срез **`fill`** (2026-08-24): fill parent + V-scroll в splitter; H-scroll / wide Rslt — ещё открыто; sticky работает *внутри* этой рамки |
 | **Исключение экрана** | форма в хосте | редко: локальный `dense`/слот; не норма |
 
 **Коротко:** продукт «кем выглядит» = хост; DataGrid «как ощущается контрол» = библиотека (метрики/паттерны). Мост = **CSS-переменные**, не копия темы Kimbie/VS внутрь fequlib.
