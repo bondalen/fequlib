@@ -3,7 +3,7 @@
 **Дата:** 2026-08-08 – 2026-08-09  
 **Проект:** feQuLib  
 **Машина:** nb-win (WSL2 Ubuntu)  
-**Статус:** ✅ docs gaps + registry backlog зафиксированы; миграция docs-registry на VPS закрыта (M0–M6)
+**Статус:** ✅ docs gaps + registry backlog зафиксированы; миграция docs-registry на VPS закрыта (M0–M6); **0016** закрыта отдельно (2026-08-18)
 
 ## Связанные документы
 
@@ -12,7 +12,8 @@
 | [chat-plan-26-0808-sudz-gaps.md](../chat-plan/chat-plan-26-0808-sudz-gaps.md) | Gaps wide preview / notify FEMSQ |
 | [chat-plan-26-0809-docs-registry-vps.md](../chat-plan/chat-plan-26-0809-docs-registry-vps.md) | Миграция registry M0–M6 |
 | [FemsqTable.md](../../../components/FemsqTable.md) | Known gaps |
-| [roadmap.md](../../../roadmap.md) | Backlog **0011–0015** |
+| [roadmap.md](../../../roadmap.md) | Backlog **0011–0016** |
+| [chat-plan-26-0818-femsq-tree.md](../chat-plan/chat-plan-26-0818-femsq-tree.md) | `FemsqTree` v1 (**0016** ✅) |
 | docs-registry `ops-vps-access.md` | Ops WG / PG на VPS |
 
 ## Контекст
@@ -33,11 +34,16 @@
 - DBHub в feQuLib (проектный `.cursor/mcp.json`; UI Customize нестабилен — не блокер)
 - Канон: `docs_registry` на VPS WG `10.7.0.1:5432` внутри `fedoc-postgres-age` (PG16+AGE); БД `fedoc` не ломали
 - Dump/restore с nb-win; `.env` / DSN → VPS; локальный `docs-registry-pg` + volume + `postgres:16-alpine` удалены
-- Post-M5: краткий WG peer down → Deactivate/Activate туннеля; smoke OK (`fequlib` 0001–0015, `docs-registry` 0001–0005)
+- Post-M5: краткий WG peer down → Deactivate/Activate туннеля; smoke OK (`fequlib` 0001–0015 на момент M5, `docs-registry` 0001–0005)
+
+### C. FemsqTree (после этого чата, 2026-08-18)
+
+- **0016** закрыта: `FemsqTree` v1 + H1 smoke на FEMSQ `sudz-sf-double` — см. [chat-plan-26-0818-femsq-tree.md](../chat-plan/chat-plan-26-0818-femsq-tree.md)
+- Registry на VPS: актуальный список **0001–0016** (без изменений DSN/инфра)
 
 ## Рекомендации на будущее
 
-1. **FemsqTable:** следующий продуктовый фокус — **0011+0012** (sticky + viewport), затем **0013/0014**; по закрытии — **0015** (notify FEMSQ / миграция Rslt preview).  
+1. **FemsqTable:** следующий продуктовый фокус — **0011+0012** (sticky + viewport), затем **0013/0014**; по закрытии — **0015** (notify FEMSQ / миграция Rslt preview). **0016** не блокирует эту цепочку.  
 2. **Registry недоступен:** сначала туннель `nb-win-cloud-ru` (`Test-NetConnection 10.7.0.1 -Port 22`); затем при необходимости `docker start fedoc-postgres-age` (`restart=no`). Не откатывать `.env` на localhost.  
 3. **MCP:** DBHub только в **проектном** `feQuLib/.cursor/mcp.json`, не в `~/.cursor/mcp.json` (конфликт с FEMSQ FishEye). CLI registry достаточен без UI MCP.  
 4. **SSH на VPS:** пользователь `user1`, не `alex`/`root`.  
@@ -48,7 +54,9 @@
 - [x] Gaps и задачи 0011–0015 в docs + registry  
 - [x] Канон docs-registry на VPS; локальный PG снят  
 - [x] Post-M5 smoke после WG  
+- [x] **0016** (`FemsqTree` v1) — закрыта 2026-08-18  
 - [ ] Реализация 0011–0014 — **следующий** чат/приоритет
 
+**Последнее обновление:** 2026-08-24  
 **Автор:** Cursor AI + Александр  
 **Создано:** 2026-08-09

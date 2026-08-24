@@ -14,10 +14,11 @@
 | [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) | `FemsqTree` v1 (задача **0016**) |
 | [chat-resume-26-0809-sudz-gaps-registry-vps.md](./development/notes/chats/chat-resume/chat-resume-26-0809-sudz-gaps-registry-vps.md) | Резюме чата 2026-08-08…09 |
 
-## Итоги (2026-08-09)
+## Итоги
 
 - **FemsqTable:** фазы A–B ок для списков FEMSQ; для СУДЗ Rslt preview зафиксированы gaps → задачи registry **0011–0015** (код грида — отдельно).
-- **docs-registry:** канон на VPS (`10.7.0.1:5432` / DB `docs_registry` в `fedoc-postgres-age`); локальный Docker `:5433` снят.
+- **FemsqTree:** v1 закрыта (задача **0016**, 2026-08-18); контракт — [FemsqTree.md](./components/FemsqTree.md).
+- **docs-registry:** канон на VPS (`10.7.0.1:5432` / DB `docs_registry` в `fedoc-postgres-age`); локальный Docker `:5433` снят; backlog fequlib **0001–0016**.
 
 ## Задачи
 

@@ -1,7 +1,7 @@
 # План: docs-registry на VPS (вторая БД в fedoc-PG)
 
 **Дата создания:** 2026-08-09  
-**Последнее обновление:** 2026-08-09 (итоги + рекомендации)  
+**Последнее обновление:** 2026-08-24 (сверка backlog **0016**)  
 **Проект:** feQuLib (+ docs-registry / инфраструктура nb-win ↔ cloud)  
 **Версия плана:** 0.1.7  
 **Статус:** ✅ миграция завершена (канон VPS; локальный PG снят; post-M5 smoke OK после WG)  
@@ -77,7 +77,7 @@
 
 - ✅ Dump локальной `docs_registry` (`pg_dump --clean --if-exists` из `docs-registry-pg`)
 - ✅ Restore на VPS (от роли `postgres` — из‑за `pgcrypto`; ownership таблиц → `docs`)
-- ✅ Сверка: проекты `docs-registry` + `fequlib`; задачи fequlib **0001–0015** (в т.ч. **0011–0015**); CLI с nb-win на VPS OK
+- ✅ Сверка: проекты `docs-registry` + `fequlib`; задачи fequlib **0001–0015** на момент M3 (в т.ч. **0011–0015**); CLI с nb-win на VPS OK; **0016** добавлена позже (2026-08-18, см. §9)
 - ✅ БД `fedoc` / AGE `1.6.0` не затронуты
 
 ### M4 — Переключение клиентов ✅
@@ -95,7 +95,7 @@
 - ✅ Образ `postgres:16-alpine` удалён (~420 MB); `ferag-postgres` / `postgres:16` не трогали
 - ✅ Smoke после удаления: CLI на VPS — проекты + fequlib tasks OK
 - ✅ `scripts/setup-dbhub.sh` — echo DSN обновлён на канон VPS
-- ✅ Post-M5 (после краткого WG peer down): туннель оживлён оператором; `:22`/`:5432` OK; smoke без override — `docs-registry`+`fequlib`, задачи fequlib **0001–0015**, docs-registry **0001–0005**; `docker start` не понадобился (PG уже слушал)
+- ✅ Post-M5 (после краткого WG peer down): туннель оживлён оператором; `:22`/`:5432` OK; smoke без override — `docs-registry`+`fequlib`, задачи fequlib **0001–0015** (на момент M5), docs-registry **0001–0005**; `docker start` не понадобился (PG уже слушал)
 
 ### M6 — Эксплуатация ✅
 
@@ -107,7 +107,7 @@
 ## 5. Критерий готовности
 
 - ✅ CLI с nb-win ходит в `docs_registry` на VPS (канон `.env`)
-- ✅ Задачи fequlib (включая 0011–0015) видны
+- ✅ Задачи fequlib (включая 0011–0015; позже **0016**) видны
 - ✅ Локальный `docs-registry-pg` удалён (`compose down -v` + image `postgres:16-alpine`)
 - ✅ DSN feQuLib/`docs-registry` на VPS (DBHub UI — optional/нестабилен, не блокер)
 - ✅ БД `fedoc` на том же инстансе цела
@@ -126,7 +126,7 @@
 | Канон данных | VPS WG `10.7.0.1:5432`, DB `docs_registry` в `fedoc-postgres-age` (рядом с `fedoc`) |
 | Клиенты | `docs-registry/.env`, feQuLib DBHub/MCP → VPS; без override env |
 | Локальный PG | `docs-registry-pg` + volume + `postgres:16-alpine` сняты; `ferag-postgres` / `postgres:16` не трогали |
-| Данные | проекты `docs-registry` + `fequlib`; fequlib tasks **0001–0015** (в т.ч. **0011–0015**) |
+| Данные | проекты `docs-registry` + `fequlib`; fequlib tasks **0001–0016** (на 2026-08-24: **0016** completed, **0011–0015** pending) |
 | Post-M5 smoke | после Deactivate→Activate `nb-win-cloud-ru`: `:22`/`:5432` OK с Windows и WSL; CLI OK; `docker start` не понадобился |
 | Docs | `ops-vps-access.md` в docs-registry; backlog **0005** закрыт; README/`.cursorrules`/roadmap согласованы |
 
@@ -141,8 +141,12 @@
 2. **Не делать:** откат DSN на `localhost:5433`; подъём локального compose как «починку» (только emergency, см. ops).  
 3. **WSL:** при живом peer NAT-режим достаточен (smoke прошёл); `networkingMode=mirrored` — опция при стойком fail WSL→`10.7`, не обязателен сейчас.  
 4. **VPS:** `fedoc-postgres-age` с `restart=no` — после ребута VPS может понадобиться ручной `docker start`.  
-5. **Продукт:** вернуться к fequlib backlog **0011–0015** (SUDZ gaps); инфраструктура registry не блокер.  
+5. **Продукт:** fequlib **0016** (`FemsqTree` v1) закрыта (2026-08-18); следующий фокус — **0011–0015** (SUDZ gaps); инфраструктура registry не блокер.  
 6. **Опционально позже:** политика restart PG (M6 follow-up), стабилизация DBHub UI — не блокеры CLI.
+
+## 9. Пост-миграция: задача **0016** (2026-08-18)
+
+После закрытия M0–M6 в registry добавлена и закрыта **0016** — `FemsqTree` v1 (nested outline, H1 на FEMSQ `sudz-sf-double`). План: [chat-plan-26-0818-femsq-tree.md](./chat-plan-26-0818-femsq-tree.md). Канон VPS не менялся; smoke `task list --project fequlib` показывает **0001–0016**.
 
 **Автор:** Cursor AI + Александр  
 **Создано:** 2026-08-09
