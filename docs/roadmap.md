@@ -12,6 +12,7 @@
 - [x] Docs: known gaps СУДЗ + backlog **0011–0015** (2026-08-08; код — отдельно)
 - [x] docs-registry канон на VPS (`10.7.0.1`); локальный `docs-registry-pg` снят (2026-08-09, M0–M6)
 - [x] `FemsqTree` v1: nested outline + H1 на FEMSQ `sudz-sf-double` (задача **0016**, 2026-08-18)
+- [x] **`FemsqChart` v1:** ECharts 5 + `ChartSpec` + `fill`; FEMSQ KSDD «Динамика» (2026-08-28)
 
 ## Backlog (задачи в registry)
 
@@ -26,13 +27,15 @@
 | **0014** | `@cell-click` API `(row, column, value/text)` | medium |
 | **0015** | Уведомить FEMSQ (СУДЗ Rslt preview) после 0011–0014 | medium |
 | 0016 | `FemsqTree` v1 (nested outline, H1 `sudz-sf-double`) | ~~high~~ **done** |
+| **0017** | **`FemsqChart` v1 (ECharts, ChartSpec); C1–C3 backlog в chat-plan** | ~~high~~ **done** (v1) |
 | 0006 | Фаза C: аудит остальных гридов потребителей | low |
 | 0007 | Фаза D: Group By (плоские строки) | low |
 | 0008 | Фазы E–G: column chooser / Filter Editor / server-side точечно | low |
 | 0009 | Упаковка Quasar App Extension (когда ≥2 потребителя) | low |
 
 План визуала: [chat-plan-26-0729-femsq-table-visual.md](./development/notes/chats/chat-plan/chat-plan-26-0729-femsq-table-visual.md) · бриф [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md).  
-План дерева: [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) · контракт [components/FemsqTree.md](./components/FemsqTree.md).
+План дерева: [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) · контракт [components/FemsqTree.md](./components/FemsqTree.md).  
+План графиков: [chat-plan-26-0828-femsq-chart.md](./development/notes/chats/chat-plan/chat-plan-26-0828-femsq-chart.md) · контракт [components/FemsqChart.md](./components/FemsqChart.md).
 
 Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md) · секция в [FemsqTable.md](./components/FemsqTable.md).
 

@@ -15,6 +15,15 @@ export {
   type FemsqTableRequest,
   type FemsqTableRowBase
 } from './components/table/femsq-table';
+export { default as FemsqChart } from './components/chart/FemsqChart.vue';
+export {
+  buildTimeSeriesChartSpec,
+  formatChartMoney,
+  type ChartSpec,
+  type ChartSeriesSpec,
+  type ChartMarkerSpec,
+  type ChartPoint
+} from './components/chart/femsq-chart';
 export { default as FemsqTree } from './components/tree/FemsqTree.vue';
 export {
   getChildren,

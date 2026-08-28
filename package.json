@@ -1,6 +1,6 @@
 {
   "name": "fequlib",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Quasar UI Kit for FEMSQ and related projects (FemsqTable first)",
   "type": "module",
@@ -19,6 +19,10 @@
     "types",
     "README.md"
   ],
+  "dependencies": {
+    "echarts": "^5.6.0",
+    "vue-echarts": "^7.0.3"
+  },
   "peerDependencies": {
     "quasar": "^2.16.0",
     "vue": "^3.4.0"

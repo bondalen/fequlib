@@ -190,4 +190,48 @@ export declare function shouldLoad<Node extends FemsqTreeNodeBase>(
 
 export declare function getLoadReason(alreadyRequested: boolean): FemsqTreeLoadReason;
 
+export type ChartKind = 'line' | 'bar' | 'combo';
+export type ChartXType = 'time' | 'category';
+
+export interface ChartPoint {
+  x: string | number;
+  y: number;
+}
+
+export interface ChartSeriesSpec {
+  id: string;
+  name: string;
+  points: ChartPoint[];
+}
+
+export interface ChartMarkerSpec {
+  type: 'horizontal' | 'point';
+  value: number;
+  date?: string;
+  label?: string;
+  style?: 'dashed' | 'solid';
+}
+
+export interface ChartSpec {
+  kind: ChartKind;
+  title?: string;
+  x: { type: ChartXType; label?: string };
+  y: { label?: string; format?: 'money' | 'number' };
+  series: ChartSeriesSpec[];
+  markers?: ChartMarkerSpec[];
+}
+
+export declare const FemsqChart: (
+  props: { spec?: ChartSpec | null; fill?: boolean; rootClass?: string; emptyLabel?: string; dataTest?: string } & Record<string, unknown>
+) => any;
+
+export declare function buildTimeSeriesChartSpec(
+  seriesName: string,
+  points: { date: string; value: number }[],
+  markers?: ChartMarkerSpec[],
+  title?: string
+): ChartSpec;
+
+export declare function formatChartMoney(value: number): string;
+
 export {};

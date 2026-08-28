@@ -4,6 +4,7 @@
 |---|---|
 | [components/FemsqTable.md](./components/FemsqTable.md) | Контракт `FemsqTable` (функционал + known gaps) |
 | [components/FemsqTree.md](./components/FemsqTree.md) | Контракт `FemsqTree` v1 (nested outline; header-click toggles `selectedKey`) |
+| [components/FemsqChart.md](./components/FemsqChart.md) | Контракт `FemsqChart` (ECharts 5, `ChartSpec`, `fill`) |
 | [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md) | Распределение дизайна хост↔lib; DX как эталон хроматики |
 | [assets/devexpress-grid/](./assets/devexpress-grid/) | Скрины-эталоны DevExpress (плотность / filter row) |
 | [roadmap.md](./roadmap.md) | Фазы, backlog, итоги инфраструктуры |
@@ -13,13 +14,15 @@
 | [chat-plan-26-0809-docs-registry-vps.md](./development/notes/chats/chat-plan/chat-plan-26-0809-docs-registry-vps.md) | docs-registry → VPS (M0–M6 ✅) |
 | [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) | `FemsqTree` v1 (задача **0016**) |
 | [chat-plan-26-0824-fill-layout.md](./development/notes/chats/chat-plan/chat-plan-26-0824-fill-layout.md) | Срез **0012**: prop `fill` Table+Tree |
+| [chat-plan-26-0828-femsq-chart.md](./development/notes/chats/chat-plan/chat-plan-26-0828-femsq-chart.md) | **`FemsqChart` v1** (задача **0017**) |
 | [chat-resume-26-0809-sudz-gaps-registry-vps.md](./development/notes/chats/chat-resume/chat-resume-26-0809-sudz-gaps-registry-vps.md) | Резюме чата 2026-08-08…09 |
 
 ## Итоги
 
 - **FemsqTable:** фазы A–B ок для списков FEMSQ; для СУДЗ Rslt preview зафиксированы gaps → задачи registry **0011–0015** (код грида — отдельно).
 - **FemsqTree:** v1 закрыта (задача **0016**, 2026-08-18); контракт — [FemsqTree.md](./components/FemsqTree.md).
-- **docs-registry:** канон на VPS (`10.7.0.1:5432` / DB `docs_registry` в `fedoc-postgres-age`); локальный Docker `:5433` снят; backlog fequlib **0001–0016**.
+- **FemsqChart:** v1 (2026-08-28); ECharts 5; контракт — [FemsqChart.md](./components/FemsqChart.md).
+- **docs-registry:** канон на VPS (`10.7.0.1:5432` / DB `docs_registry` в `fedoc-postgres-age`); локальный Docker `:5433` снят; backlog fequlib **0001–0017**.
 
 ## Задачи
 
