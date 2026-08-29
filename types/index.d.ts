@@ -31,6 +31,8 @@ export interface FemsqTableColumn<Row extends FemsqTableRowBase = FemsqTableRowB
   headerStyle?: string;
   headerClasses?: string;
   format?: (value: unknown, row: Row) => string;
+  /** Семантика значения: `money` → ru-RU формат суммы в cellText. */
+  valueKind?: 'money';
   /** Участвует ли колонка в глобальном фильтре (по умолчанию true). */
   filterable?: boolean;
   /**
@@ -97,6 +99,21 @@ export declare function columnFilterText<Row extends FemsqTableRowBase>(
 export declare function actionsColumn<Row extends FemsqTableRowBase = FemsqTableRowBase>(
   partial?: Partial<FemsqTableColumn<Row>>
 ): FemsqTableColumn<Row>;
+
+export declare function moneyColumn<Row extends FemsqTableRowBase = FemsqTableRowBase>(
+  partial: Partial<FemsqTableColumn<Row>> & Pick<FemsqTableColumn<Row>, 'name' | 'label' | 'field'>
+): FemsqTableColumn<Row>;
+
+export interface FormatMoneyOptions {
+  locale?: string;
+  minimumFractionDigits?: number;
+  maximumFractionDigits?: number;
+  currencySuffix?: string;
+}
+
+export declare function formatMoney(value: unknown, options?: FormatMoneyOptions): string;
+
+export declare function formatMoneyOrDash(value: unknown, options?: FormatMoneyOptions): string;
 
 export declare function sortComparable(value: unknown): {
   kind: 'null' | 'number' | 'date' | 'string';

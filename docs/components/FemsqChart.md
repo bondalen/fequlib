@@ -1,6 +1,6 @@
 # FemsqChart
 
-**Версия:** 0.1.0 (2026-08-28)  
+**Версия:** 0.1.0 (2026-08-28), tooltip money — общий `formatMoney` с v0.1.2  
 **Платформа:** [ADR 010 FEMSQ](../../../femsq/docs/project/decisions/010-chart-platform-echarts.md) (ECharts 5)
 
 ## Назначение
@@ -10,7 +10,7 @@
 ## Контракт
 
 ```typescript
-import { FemsqChart, buildTimeSeriesChartSpec, type ChartSpec } from 'fequlib';
+import { FemsqChart, buildTimeSeriesChartSpec, formatChartMoney, type ChartSpec } from 'fequlib';
 
 const spec = buildTimeSeriesChartSpec(
   'ciaName=1',
@@ -26,6 +26,8 @@ const spec = buildTimeSeriesChartSpec(
 | `spec` | `ChartSpec \| null` | — | данные графика |
 | `fill` | `boolean` | `false` | заполнить высоту родителя (splitter) |
 | `emptyLabel` | `string` | «Нет данных…» | пустое состояние |
+
+Tooltip при `y.format: 'money'` использует `formatChartMoney` → `formatMoney` + суффикс ` ₽` ([format-money.md](./format-money.md)).
 
 ## Зависимости
 

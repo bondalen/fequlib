@@ -1,6 +1,6 @@
 # feQuLib
 
-Quasar UI Kit для FEMSQ и смежных проектов. Компоненты: `FemsqTable`, `FemsqTree` (v1), **`FemsqChart`** (ECharts 5, v0.1.1).
+Quasar UI Kit для FEMSQ и смежных проектов. Компоненты: `FemsqTable`, `FemsqTree` (v1), **`FemsqChart`** (ECharts 5), **`formatMoney`** (v0.1.2).
 
 **Репозиторий:** https://github.com/bondalen/fequlib  
 **npm-пакет:** `fequlib`
@@ -26,6 +26,9 @@ import {
   FemsqChart,
   buildTimeSeriesChartSpec,
   actionsColumn,
+  moneyColumn,
+  formatMoney,
+  formatMoneyOrDash,
   type FemsqTableColumn,
   type ChartSpec
 } from 'fequlib';
@@ -34,13 +37,13 @@ import {
 ## Тесты и проверка типов
 
 ```bash
-npm test          # Vitest: чистые функции femsq-table (filter/sort)
+npm test          # Vitest: femsq-table, format-money, chart, tree
 npm run typecheck # vue-tsc
 ```
 
 CI: локально `npm test` + `npm run typecheck`. Пример workflow: [`docs/development/ci-workflow.example.yml`](./docs/development/ci-workflow.example.yml) (в `.github/workflows/` — при токене с scope `workflow`).
 
-Покрыт контракт фильтрации/сортировки (`cellText`, `rowMatches*`, `compareCellValues`). Не покрыты: Vue SFC `FemsqTable.vue`, слоты header/body, интеграция с QTable.
+Покрыт контракт фильтрации/сортировки (`cellText`, `rowMatches*`, `compareCellValues`), `formatMoney` / `valueKind: 'money'`. Не покрыты: Vue SFC `FemsqTable.vue`, слоты header/body, интеграция с QTable.
 
 ## Связанные проекты
 

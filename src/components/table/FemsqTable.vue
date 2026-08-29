@@ -75,6 +75,7 @@
 import { computed, onMounted, ref, useAttrs, useSlots, watch } from 'vue';
 import { QIcon, QInput, QTable, QTh, type QTableColumn, type QTableProps } from 'quasar';
 
+import { formatMoney } from '../../format/format-money';
 import {
   cellText,
   columnFieldValue,
@@ -229,11 +230,24 @@ const forwardedSlots = computed(() => {
   return result;
 });
 
+/**
+ * QTable рисует ячейки через `col.format`, а не через cellText.
+ * valueKind=money без своего format → подставляем formatMoney.
+ */
 const normalizedColumns = computed(() =>
-  props.columns.map((col) => ({
-    ...col,
-    sortable: col.sortable ?? true
-  }))
+  props.columns.map((col) => {
+    const base = {
+      ...col,
+      sortable: col.sortable ?? true
+    };
+    if (col.valueKind === 'money' && typeof col.format !== 'function') {
+      return {
+        ...base,
+        format: (value: unknown) => formatMoney(value)
+      };
+    }
+    return base;
+  })
 );
 const filteredRows = computed(() => {
   if (props.mode === 'server') {

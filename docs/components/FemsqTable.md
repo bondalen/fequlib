@@ -2,7 +2,7 @@
 
 Тонкая обёртка над Quasar `QTable`: единый контракт фильтрации/сортировки/форматирования.
 
-**Пакет:** `fequlib` · **импорт:** `import { FemsqTable, actionsColumn, type FemsqTableColumn } from 'fequlib'`
+**Пакет:** `fequlib` · **импорт:** `import { FemsqTable, actionsColumn, moneyColumn, formatMoney, type FemsqTableColumn } from 'fequlib'`
 
 **Визуал / распределение с хостом:** [design/FemsqTable-visual-target.md](../design/FemsqTable-visual-target.md) (тема продукта ≠ хроматика грида; DX — эталон плотности, не палитры).
 
@@ -12,7 +12,9 @@
 |---|---|
 | Generic `Row` | `rows: Row[]`, `columns: FemsqTableColumn<Row>[]`; `@row-click` отдаёт `Row` |
 | `FemsqTableRowBase` | `Record<string, any>` — DTO-интерфейсы без index signature без `as unknown as` |
-| `cellText(row, col)` | `col.format ? col.format(value, row) : String(value ?? '')` |
+| `cellText(row, col)` | `col.format ? col.format(value, row) : valueKind==='money' ? formatMoney(value) : String(value ?? '')` |
+| `valueKind: 'money'` | ru-RU через [formatMoney](./format-money.md): пробел — разделитель тысяч, запятая — дробная часть (`186961.48` → `186 961,48`) |
+| `moneyColumn({ name, label, field })` | хелпер: `align: 'right'`, `valueKind: 'money'` |
 | `filterValue?: (row) => string` | Для `#body-cell-*`, если колонка в поиске; иначе `filterable: false` или dev-warning |
 | `actionsColumn()` | `filterable: false`, `sortable: false` — без UI колоночного фильтра |
 | `mode: 'client' \| 'server'` | Server эмитит `@request` `{ filter, columnFilters?, sortBy, descending, page, rowsPerPage }` |
@@ -33,6 +35,23 @@ const columns: FemsqTableColumn<ConstructionSiteDto>[] = [
 // template: <FemsqTable :rows="sites" :columns="columns" @row-click="onClick" />
 function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизирован */ }
 ```
+
+### Денежные колонки (valueKind, v0.1.2)
+
+```ts
+import { FemsqTable, moneyColumn, formatMoneyOrDash, type FemsqTableColumn } from 'fequlib';
+
+const columns: FemsqTableColumn<MyRow>[] = [
+  moneyColumn({ name: 'amount', label: 'Сумма', field: 'amount' }),
+  // эквивалент:
+  { name: 'debt', label: 'Долг', field: 'debt', valueKind: 'money', align: 'right' }
+];
+```
+
+- **Отображение в гриде:** `FemsqTable` прокидывает `formatMoney` в `col.format` для QTable (иначе `valueKind` не влиял бы на ячейку).
+- **Фильтр:** через `cellText` → та же отформатированная строка (`186 961,48`).
+- Сортировка — по **сырому** значению поля (`compareCellValues`), не по тексту ячейки.
+- Вне таблицы (key-value): `formatMoneyOrDash(row.debt)` — см. [format-money.md](./format-money.md).
 
 Агрегатные предикаты (COUNT/EXISTS) — обычные колонки строки, не единственный UI-тумблер.
 
@@ -88,7 +107,7 @@ function onClick(_e: Event, row: ConstructionSiteDto) { /* row типизиро�
 | Стройки · перечень | `ConstructionSitesView.vue` |
 | Стройки · отчёты | `CstReportsTab.vue` |
 | Стройки · аренда | `CstRentReportsTab.vue` |
-| СУДЗ · списки (годы, долги, стройки) | FemsqTable — ок (фазы A–B) |
+| СУДЗ · КСДСФ / КСДД | `SudzSfDoubleView`, `SudzInvDbtDoubleView` — `moneyColumn`, `formatMoneyOrDash` (v0.1.2) |
 | СУДЗ · предпросмотр Rslt | **не** FemsqTable — native HTML-grid (см. gaps ниже) |
 
 Подробнее: FEMSQ `docs/development/notes/UI/02-8_femsq-table-component.md`, `02-9_sudz-mvp-screens.md`.

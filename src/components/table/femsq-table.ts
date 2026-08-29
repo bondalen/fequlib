@@ -1,5 +1,7 @@
 import type { QTableColumn } from 'quasar';
 
+import { formatMoney } from '../../format/format-money';
+
 /**
  * Базовый тип строки таблицы.
  * `any` в значении — намеренно: DTO-интерфейсы без index signature
@@ -29,12 +31,19 @@ export interface FemsqTableRequest {
   rowsPerPage: number;
 }
 
+export type FemsqTableValueKind = 'money';
+
 /**
  * Колонка FemsqTable: расширяет QTableColumn полями фильтрации.
  */
 export type FemsqTableColumn<Row extends FemsqTableRowBase = FemsqTableRowBase> = QTableColumn<Row> & {
   /** Участвует ли колонка в глобальном фильтре (по умолчанию true). */
   filterable?: boolean;
+  /**
+   * Семантика значения ячейки для стандартного форматирования (если нет `format`).
+   * `money` — {@link formatMoney} (ru-RU: пробел тысяч, запятая дробной части).
+   */
+  valueKind?: FemsqTableValueKind;
   /**
    * Текст для фильтра, если ячейка рисуется через #body-cell-* и стандартный
    * cellText не отражает смысл (иконки/кнопки).
@@ -70,6 +79,9 @@ export function cellText<Row extends FemsqTableRowBase>(
   if (typeof col.format === 'function') {
     return String(col.format(value, row) ?? '');
   }
+  if (col.valueKind === 'money') {
+    return formatMoney(value);
+  }
   return value == null ? '' : String(value);
 }
 
@@ -84,6 +96,19 @@ export function columnFilterText<Row extends FemsqTableRowBase>(
     return col.filterValue(row) ?? '';
   }
   return cellText(row, col);
+}
+
+/**
+ * Хелпер денежной колонки: `valueKind: 'money'`, выравнивание вправо.
+ */
+export function moneyColumn<Row extends FemsqTableRowBase = FemsqTableRowBase>(
+  partial: Partial<FemsqTableColumn<Row>> & Pick<FemsqTableColumn<Row>, 'name' | 'label' | 'field'>
+): FemsqTableColumn<Row> {
+  return {
+    align: 'right',
+    valueKind: 'money',
+    ...partial
+  };
 }
 
 /**

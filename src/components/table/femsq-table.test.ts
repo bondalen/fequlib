@@ -61,6 +61,27 @@ describe('cellText / columnFilterText', () => {
     expect(cellText({ name: 'A', amount: 10 } as Row, formatted)).toBe('A:10');
   });
 
+  it('formats valueKind money via ru-RU', () => {
+    const moneyCol = col({
+      name: 'amount',
+      label: 'Amount',
+      field: 'amount',
+      valueKind: 'money'
+    });
+    expect(cellText({ amount: 186961.48 } as Row, moneyCol)).toBe('186\u00a0961,48');
+  });
+
+  it('custom format overrides valueKind', () => {
+    const mixed = col({
+      name: 'amount',
+      label: 'Amount',
+      field: 'amount',
+      valueKind: 'money',
+      format: () => 'custom'
+    });
+    expect(cellText({ amount: 1 } as Row, mixed)).toBe('custom');
+  });
+
   it('supports field as function', () => {
     const derived = col({
       name: 'full',

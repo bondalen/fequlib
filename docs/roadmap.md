@@ -13,6 +13,7 @@
 - [x] docs-registry канон на VPS (`10.7.0.1`); локальный `docs-registry-pg` снят (2026-08-09, M0–M6)
 - [x] `FemsqTree` v1: nested outline + H1 на FEMSQ `sudz-sf-double` (задача **0016**, 2026-08-18)
 - [x] **`FemsqChart` v1:** ECharts 5 + `ChartSpec` + `fill`; FEMSQ KSDD «Динамика» (2026-08-28)
+- [x] **`formatMoney` + `valueKind: 'money'`:** `moneyColumn`, ru-RU суммы в FemsqTable; FEMSQ KSDD/КСДСФ (2026-08-29, v0.1.2)
 
 ## Backlog (задачи в registry)
 

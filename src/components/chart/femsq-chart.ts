@@ -2,6 +2,8 @@
  * Контракт данных для FemsqChart (общий для UI и задел под отчёты).
  */
 
+import { formatMoney } from '../../format/format-money';
+
 /** Тип диаграммы v1. */
 export type ChartKind = 'line' | 'bar' | 'combo';
 
@@ -89,8 +91,5 @@ export function buildTimeSeriesChartSpec(
  * @returns строка
  */
 export function formatChartMoney(value: number): string {
-  return new Intl.NumberFormat('ru-RU', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value);
+  return formatMoney(value, { currencySuffix: ' ₽' });
 }

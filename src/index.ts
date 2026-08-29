@@ -5,6 +5,7 @@ export {
   columnFieldValue,
   columnFilterText,
   compareCellValues,
+  moneyColumn,
   normalizeColumnFilters,
   rowMatchesAllFilters,
   rowMatchesColumnFilters,
@@ -13,8 +14,10 @@ export {
   type FemsqTableColumn,
   type FemsqTableMode,
   type FemsqTableRequest,
-  type FemsqTableRowBase
+  type FemsqTableRowBase,
+  type FemsqTableValueKind
 } from './components/table/femsq-table';
+export { formatMoney, formatMoneyOrDash, type FormatMoneyOptions } from './format/format-money';
 export { default as FemsqChart } from './components/chart/FemsqChart.vue';
 export {
   buildTimeSeriesChartSpec,
