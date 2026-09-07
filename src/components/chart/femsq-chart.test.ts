@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildTimeSeriesChartSpec, formatChartMoney } from './femsq-chart';
+import {
+  buildSlotDynamicsChartSpec,
+  buildTimeSeriesChartSpec,
+  CHART_EXCEL_SERIES_COLOR,
+  formatChartMoney,
+  zoomInWindow,
+  zoomOutWindow
+} from './femsq-chart';
 
 describe('femsq-chart', () => {
   it('buildTimeSeriesChartSpec maps points', () => {
@@ -14,6 +21,36 @@ describe('femsq-chart', () => {
     expect(spec.series[0].points).toHaveLength(2);
     expect(spec.markers).toHaveLength(1);
     expect(spec.y.format).toBe('money');
+  });
+
+  it('buildSlotDynamicsChartSpec adds red Excel point with vertical label', () => {
+    const spec = buildSlotDynamicsChartSpec(
+      'ciaName=2',
+      [{ date: '2025-06-30', value: 1401.57 }],
+      { date: '2025-12-31', value: 200.23 },
+      'DbtValue по выгрузкам'
+    );
+    expect(spec.zoomControls).toBe(true);
+    expect(spec.series).toHaveLength(2);
+    expect(spec.series[1].id).toBe('excel');
+    expect(spec.series[1].color).toBe(CHART_EXCEL_SERIES_COLOR);
+    expect(spec.series[1].showLine).toBe(false);
+    expect(spec.series[1].chartType).toBe('scatter');
+    expect(spec.series[1].pointLabelRotate).toBe(90);
+    expect(spec.y.label).toBeUndefined();
+    expect(spec.series[1].pointLabel).toMatch(/Excel/);
+    expect(spec.series[1].points).toEqual([{ x: '2025-12-31', y: 200.23 }]);
+    expect(spec.markers).toBeUndefined();
+  });
+
+  it('zoomInWindow keeps right edge', () => {
+    expect(zoomInWindow(0, 100, 2)).toEqual({ start: 50, end: 100 });
+  });
+
+  it('zoomOutWindow expands toward full range', () => {
+    const out = zoomOutWindow(40, 60, 2);
+    expect(out.start).toBeLessThan(40);
+    expect(out.end).toBeGreaterThan(60);
   });
 
   it('formatChartMoney uses ru locale', () => {

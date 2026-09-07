@@ -21,7 +21,11 @@ export { formatMoney, formatMoneyOrDash, type FormatMoneyOptions } from './forma
 export { default as FemsqChart } from './components/chart/FemsqChart.vue';
 export {
   buildTimeSeriesChartSpec,
+  buildSlotDynamicsChartSpec,
   formatChartMoney,
+  zoomInWindow,
+  zoomOutWindow,
+  CHART_EXCEL_SERIES_COLOR,
   type ChartSpec,
   type ChartSeriesSpec,
   type ChartMarkerSpec,

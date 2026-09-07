@@ -219,6 +219,12 @@ export interface ChartSeriesSpec {
   id: string;
   name: string;
   points: ChartPoint[];
+  chartType?: 'line' | 'bar' | 'scatter';
+  color?: string;
+  symbolSize?: number;
+  showLine?: boolean;
+  pointLabel?: string;
+  pointLabelRotate?: number;
 }
 
 export interface ChartMarkerSpec {
@@ -236,11 +242,14 @@ export interface ChartSpec {
   y: { label?: string; format?: 'money' | 'number' };
   series: ChartSeriesSpec[];
   markers?: ChartMarkerSpec[];
+  zoomControls?: boolean;
 }
 
 export declare const FemsqChart: (
   props: { spec?: ChartSpec | null; fill?: boolean; rootClass?: string; emptyLabel?: string; dataTest?: string } & Record<string, unknown>
 ) => any;
+
+export declare const CHART_EXCEL_SERIES_COLOR: string;
 
 export declare function buildTimeSeriesChartSpec(
   seriesName: string,
@@ -248,6 +257,25 @@ export declare function buildTimeSeriesChartSpec(
   markers?: ChartMarkerSpec[],
   title?: string
 ): ChartSpec;
+
+export declare function buildSlotDynamicsChartSpec(
+  slotSeriesName: string,
+  slotPoints: { date: string; value: number }[],
+  excel?: { date: string; value: number } | null,
+  title?: string
+): ChartSpec;
+
+export declare function zoomInWindow(
+  start: number,
+  end: number,
+  factor?: number
+): { start: number; end: number };
+
+export declare function zoomOutWindow(
+  start: number,
+  end: number,
+  factor?: number
+): { start: number; end: number };
 
 export declare function formatChartMoney(value: number): string;
 
