@@ -96,7 +96,7 @@ const columns: FemsqTableColumn<MyRow>[] = [
 ## Границы
 
 - **Group By** — группировка плоских строк по колонке (фаза D).
-- **Иерархия** — не этот компонент. Nested outline: [`FemsqTree`](./FemsqTree.md) (v1). Колоночный TreeList — отдельно, позже.
+- **Иерархия** — не этот компонент. Nested outline: [`FemsqTree`](./FemsqTree.md) (v1). Колоночное дерево: [`FemsqTreeList`](./FemsqTreeList.md).
 - **Filter Editor** (фаза F) — не этот MVP.
 - **Тема продукта** — не fequlib (см. visual-target).
 

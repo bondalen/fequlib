@@ -14,6 +14,7 @@
 - [x] `FemsqTree` v1: nested outline + H1 на FEMSQ `sudz-sf-double` (задача **0016**, 2026-08-18)
 - [x] **`FemsqChart` v1:** ECharts 5 + `ChartSpec` + `fill`; FEMSQ KSDD «Динамика» (2026-08-28)
 - [x] **`formatMoney` + `valueKind: 'money'`:** `moneyColumn`, ru-RU суммы в FemsqTable; FEMSQ KSDD/КСДСФ (2026-08-29, v0.1.2)
+- [x] **`FemsqTreeList` v1 (lib):** колоночное дерево + `view: list` у обходчика (2026-09-26; задача **0018**; хост — следующий шаг)
 
 ## Backlog (задачи в registry)
 
@@ -29,6 +30,7 @@
 | **0015** | Уведомить FEMSQ (СУДЗ Rslt preview) после 0011–0014 | medium |
 | 0016 | `FemsqTree` v1 (nested outline, H1 `sudz-sf-double`) | ~~high~~ **done** |
 | **0017** | **`FemsqChart` v1 (ECharts, ChartSpec); C1–C3 backlog в chat-plan** | ~~high~~ **done** (v1) |
+| **0018** | **`FemsqTreeList` + представление `list` у обходчика** (lib; хост позже) | **high** |
 | 0006 | Фаза C: аудит остальных гридов потребителей | low |
 | 0007 | Фаза D: Group By (плоские строки) | low |
 | 0008 | Фазы E–G: column chooser / Filter Editor / server-side точечно | low |
@@ -36,6 +38,7 @@
 
 План визуала: [chat-plan-26-0729-femsq-table-visual.md](./development/notes/chats/chat-plan/chat-plan-26-0729-femsq-table-visual.md) · бриф [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md).  
 План дерева: [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) · контракт [components/FemsqTree.md](./components/FemsqTree.md).  
+План колоночного дерева: [chat-plan-26-0926-femsq-tree-list.md](./development/notes/chats/chat-plan/chat-plan-26-0926-femsq-tree-list.md) · контракт [components/FemsqTreeList.md](./components/FemsqTreeList.md).  
 План графиков: [chat-plan-26-0828-femsq-chart.md](./development/notes/chats/chat-plan/chat-plan-26-0828-femsq-chart.md) · контракт [components/FemsqChart.md](./components/FemsqChart.md).
 
 Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md) · секция в [FemsqTable.md](./components/FemsqTable.md).
@@ -51,7 +54,7 @@ Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/c
 
 ## Future (не сейчас)
 
-- `FemsqTreeList` — колоночное дерево (агенты / стороны договора); отдельное обоснование, не режим `FemsqTree` v1.
+- клавиатура / виртуализация дерева — отдельно от `FemsqTreeList` v1.
 
 ## Принцип
 

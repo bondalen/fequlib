@@ -207,6 +207,87 @@ export declare function shouldLoad<Node extends FemsqTreeNodeBase>(
 
 export declare function getLoadReason(alreadyRequested: boolean): FemsqTreeLoadReason;
 
+export type FemsqTreeListLevel = 'table' | 'edge';
+
+export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
+  name: string;
+  label: string;
+  field: string;
+  align?: 'left' | 'right' | 'center';
+  width?: string;
+  format?: (value: unknown, node: Node) => string;
+  /** `record` → table, `folder` → edge. Нет совпадения — ячейка пустая. */
+  level?: FemsqTreeListLevel;
+}
+
+export interface FemsqTreeListProps<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
+  nodes: readonly Node[];
+  nodeKey: FemsqTreeNodeKey<Node>;
+  columns: FemsqTreeListColumn<Node>[];
+  childrenKey?: string;
+  leafKey?: string;
+  expandedKeys?: FemsqTreeKey[];
+  selectedKey?: FemsqTreeKey | null;
+  loadingKeys?: FemsqTreeKey[];
+  indent?: number;
+  expandOnClick?: boolean;
+  selectable?: boolean;
+  lazy?: boolean;
+  rootClass?: string;
+  /** Fill parent height; scroll in `.femsq-tree-list__scroll`, sticky header. */
+  fill?: boolean;
+}
+
+export declare const FemsqTreeList: <Node extends FemsqTreeNodeBase = FemsqTreeNodeBase>(
+  props: FemsqTreeListProps<Node> & Record<string, unknown>
+) => any;
+
+export declare function treeListRowIndentPx(depth: number, indent: number): number;
+
+export declare function treeListShowsToggle<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  leafKey?: string
+): boolean;
+
+export declare function walkNodeLevel(node: FemsqTreeNodeBase): FemsqTreeListLevel | undefined;
+
+export declare function treeListCellText<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  column: FemsqTreeListColumn<Node>
+): string;
+
+export declare function treeListColumnTracks(
+  columns: readonly { width?: string }[],
+  hasActions: boolean
+): string;
+
+export type FemsqWalkView = 'outline' | 'list';
+
+export interface FemsqWalkListColumn {
+  label: string;
+  field: string;
+  level?: FemsqTreeListLevel;
+}
+
+export interface FemsqWalkSpecView {
+  view?: FemsqWalkView | null;
+  columns?: FemsqWalkListColumn[];
+}
+
+export declare function resolveWalkView(view: unknown): FemsqWalkView;
+
+export declare function usesWalkList(spec: { view?: unknown } | null | undefined): boolean;
+
+export declare function walkColumnsToTreeList(
+  columns: readonly FemsqWalkListColumn[] | undefined | null
+): FemsqTreeListColumn[];
+
+export declare function assignWalkListFields<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  fields: Record<string, string | null | undefined>,
+  columns: readonly FemsqWalkListColumn[]
+): Node;
+
 export type ChartKind = 'line' | 'bar' | 'combo';
 export type ChartXType = 'time' | 'category';
 

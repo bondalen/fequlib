@@ -1,6 +1,6 @@
 # FemsqTree
 
-Рекурсивный nested-tree: заголовок узла, опциональная деталь выбранного узла, дети по expand. Не режим `FemsqTable` и не колоночный TreeList.
+Рекурсивный nested-tree: заголовок узла, опциональная деталь выбранного узла, дети по expand. Не режим `FemsqTable`. Колонки — [`FemsqTreeList`](./FemsqTreeList.md), не v1.
 
 **Пакет:** `fequlib` · **импорт:** `import { FemsqTree } from 'fequlib'`  
 **План:** [chat-plan-26-0818-femsq-tree.md](../development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md)  
@@ -197,7 +197,7 @@ src/components/tree/femsq-tree-context.ts
 
 Не входит: multi-select, checkbox/tick, DnD, tree-table / `FemsqTreeList`, полный keyboard/ARIA tree, virtualization, filter внутри дерева, accordion, обёртка `QTree`, CRUD в API, линии-коннекторы, мутация `nodes` внутри lib, бренд-тема FEMSQ.
 
-`FemsqTreeList` (колонки, как деревья агентов/сторон в FEMSQ) — отдельное обоснование, не этот компонент.
+Колоночное дерево — [`FemsqTreeList`](./FemsqTreeList.md) (план 2026-09-26). Это не режим v1 и не наследник `FemsqTree`.
 
 ## Потребители (FEMSQ)
 

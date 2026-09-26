@@ -44,3 +44,22 @@ export {
   type FemsqTreeNodeBase,
   type FemsqTreeNodeKey
 } from './components/tree/femsq-tree';
+export { default as FemsqTreeList } from './components/tree/FemsqTreeList.vue';
+export {
+  treeListCellText,
+  treeListColumnTracks,
+  treeListRowIndentPx,
+  treeListShowsToggle,
+  walkNodeLevel,
+  type FemsqTreeListColumn,
+  type FemsqTreeListLevel
+} from './components/tree/femsq-tree-list';
+export {
+  assignWalkListFields,
+  resolveWalkView,
+  usesWalkList,
+  walkColumnsToTreeList,
+  type FemsqWalkListColumn,
+  type FemsqWalkSpecView,
+  type FemsqWalkView
+} from './components/tree/femsq-walk-view';
