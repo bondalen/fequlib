@@ -302,6 +302,17 @@ export declare function treeListGroupCaptionFlags(
   levels: readonly (string | undefined | null)[]
 ): boolean[];
 
+export declare function treeListFolderShowsSetLabels(
+  node: FemsqTreeNodeBase,
+  trackIndex: number
+): boolean;
+
+export declare function treeListSetCellText(
+  node: FemsqTreeNodeBase,
+  set: FemsqTreeListColumnSet | undefined,
+  trackIndex: number
+): string;
+
 export type FemsqWalkView = 'outline' | 'list';
 
 export interface FemsqWalkListColumn {

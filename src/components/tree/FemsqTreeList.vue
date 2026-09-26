@@ -331,17 +331,6 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
   border-bottom: 1px solid color-mix(in srgb, currentColor 24%, transparent);
 }
 
-:deep(.femsq-tree-list__set-labels) {
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / -1;
-  align-items: center;
-  min-height: var(--fequlib-tree-row-height, 32px);
-  color: inherit;
-  font-weight: 600;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-}
-
 :deep(.femsq-tree-list__cell) {
   display: flex;
   flex-direction: row;
@@ -356,6 +345,11 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+:deep(.femsq-tree-list__cell-text--muted) {
+  opacity: 0.62;
+  font-weight: 600;
 }
 
 :deep(.femsq-tree-list__indent) {

@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   treeListCellText,
+  treeListFolderShowsSetLabels,
   treeListGroupCaptionFlags,
   treeListLevelMatches,
   treeListRowIndentPx,
+  treeListSetCellText,
   treeListSetForNode,
   treeListSetLabels,
   treeListSetTrackCount,
@@ -166,6 +168,36 @@ describe('columnSets', () => {
       false,
       true
     ]);
+  });
+
+  it('puts set labels on folder tracks after zero and keeps field values on records', () => {
+    const payment = [
+      {
+        level: 'agent',
+        columns: [
+          { name: 'label', label: 'Подпись', field: 'title' },
+          { name: 'key', label: 'Ключ', field: 'code' },
+          { name: 'extra', label: 'Дополнение', field: 'note' }
+        ]
+      }
+    ];
+    const folder = { kind: 'folder', level: 'agent', title: 'Агенты' };
+    const record = { kind: 'record', level: 'agent', title: 'Иванов', code: '12', note: 'ост' };
+
+    expect(treeListFolderShowsSetLabels(folder, 0)).toBe(false);
+    expect(treeListFolderShowsSetLabels(folder, 1)).toBe(true);
+    expect(treeListFolderShowsSetLabels(record, 1)).toBe(false);
+
+    const set = treeListSetForNode(folder, payment);
+    expect(treeListSetCellText(folder, set, 0)).toBe('Агенты');
+    expect(treeListSetCellText(folder, set, 1)).toBe('Ключ');
+    expect(treeListSetCellText(folder, set, 2)).toBe('Дополнение');
+    expect(treeListSetCellText(folder, set, 0)).not.toBe('Подпись');
+
+    const recordSet = treeListSetForNode(record, payment);
+    expect(treeListSetCellText(record, recordSet, 0)).toBe('Иванов');
+    expect(treeListSetCellText(record, recordSet, 1)).toBe('12');
+    expect(treeListSetCellText(record, recordSet, 2)).toBe('ост');
   });
 
   it('matches table and edge by kind only when node.level is absent', () => {

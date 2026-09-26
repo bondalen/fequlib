@@ -48,9 +48,11 @@ export { default as FemsqTreeList } from './components/tree/FemsqTreeList.vue';
 export {
   treeListCellText,
   treeListColumnTracks,
+  treeListFolderShowsSetLabels,
   treeListGroupCaptionFlags,
   treeListLevelMatches,
   treeListRowIndentPx,
+  treeListSetCellText,
   treeListSetForNode,
   treeListSetLabels,
   treeListSetLevel,

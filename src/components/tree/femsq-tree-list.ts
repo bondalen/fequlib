@@ -187,7 +187,7 @@ export function treeListSetLevel<Node extends FemsqTreeNodeBase>(
 
 /**
  * Перед каким соседом рисовать строку подписей.
- * Группа — подряд идущие соседи одного комплекта. Смена уровня начинает новую.
+ * Оставлено для совместимости тестов: renderer больше не вставляет отдельную линию.
  */
 export function treeListGroupCaptionFlags(levels: readonly (string | undefined | null)[]): boolean[] {
   const flags: boolean[] = [];
@@ -206,4 +206,32 @@ export function treeListGroupCaptionFlags(levels: readonly (string | undefined |
     hasPrevious = true;
   }
   return flags;
+}
+
+/**
+ * Папка в режиме комплектов: дорожки после нулевой показывают `columns[i].label`.
+ * Нулевая дорожка остаётся названием группы (значение поля), не «Подпись».
+ */
+export function treeListFolderShowsSetLabels(node: FemsqTreeNodeBase, trackIndex: number): boolean {
+  return node.kind === 'folder' && trackIndex >= 1;
+}
+
+/**
+ * Текст ячейки при columnSets.
+ * Папка: 0 — поле узла; 1…N — подпись колонки комплекта.
+ * Запись: только значения полей.
+ */
+export function treeListSetCellText<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  set: FemsqTreeListColumnSet<Node> | undefined,
+  trackIndex: number
+): string {
+  const column = set?.columns[trackIndex];
+  if (treeListFolderShowsSetLabels(node, trackIndex)) {
+    return column?.label ?? '';
+  }
+  if (!column) {
+    return '';
+  }
+  return treeListCellText(node, { ...column, level: undefined });
 }

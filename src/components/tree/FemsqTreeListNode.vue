@@ -28,7 +28,10 @@
             </slot>
           </span>
         </template>
-        <span class="femsq-tree-list__cell-text">{{ cell ? cellText(cell) : '' }}</span>
+        <span
+          class="femsq-tree-list__cell-text"
+          :class="{ 'femsq-tree-list__cell-text--muted': isFolderLabel(index) }"
+        >{{ cellTextAt(index) }}</span>
       </div>
       <div v-if="ctx.hasActions" class="femsq-tree-list__cell femsq-tree-list__cell--actions" @click.stop>
         <slot name="actions" v-bind="nodeSlotProps" />
@@ -70,7 +73,9 @@ import { femsqTreeListContextKey } from './femsq-tree-list-context';
 import { getChildren, getNodeKey, type FemsqTreeKey, type FemsqTreeNodeBase } from './femsq-tree';
 import {
   treeListCellText,
+  treeListFolderShowsSetLabels,
   treeListRowIndentPx,
+  treeListSetCellText,
   treeListSetForNode,
   treeListShowsToggle,
   type FemsqTreeListColumn
@@ -135,11 +140,15 @@ const indentStyle = computed(() => ({
   width: `${treeListRowIndentPx(props.depth, ctx.indent)}px`
 }));
 
+const rowSet = computed(() =>
+  ctx.useColumnSets ? treeListSetForNode(props.node, ctx.columnSets) : undefined
+);
+
 const rowCells = computed(() => {
   if (!ctx.useColumnSets) {
     return ctx.columns;
   }
-  const set = treeListSetForNode(props.node, ctx.columnSets);
+  const set = rowSet.value;
   const cells: Array<FemsqTreeListColumn | undefined> = [];
   for (let index = 0; index < ctx.trackCount; index += 1) {
     const column = set?.columns[index];
@@ -148,8 +157,16 @@ const rowCells = computed(() => {
   return cells;
 });
 
-function cellText(column: FemsqTreeListColumn): string {
-  return treeListCellText(props.node, column);
+function cellTextAt(index: number): string {
+  if (ctx.useColumnSets) {
+    return treeListSetCellText(props.node, rowSet.value, index);
+  }
+  const column = rowCells.value[index];
+  return column ? treeListCellText(props.node, column) : '';
+}
+
+function isFolderLabel(index: number): boolean {
+  return ctx.useColumnSets && treeListFolderShowsSetLabels(props.node, index);
 }
 
 function cellStyle(column: FemsqTreeListColumn): Record<string, string> | undefined {
