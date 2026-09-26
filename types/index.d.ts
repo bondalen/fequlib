@@ -229,7 +229,9 @@ export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeN
 export interface FemsqTreeListProps<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
   nodes: readonly Node[];
   nodeKey: FemsqTreeNodeKey<Node>;
-  columns: FemsqTreeListColumn<Node>[];
+  columns?: FemsqTreeListColumn<Node>[];
+  /** Absent — sticky header from `columns`. Present — per-branch sets, track count is the widest set. */
+  columnSets?: FemsqTreeListColumnSet<Node>[];
   childrenKey?: string;
   leafKey?: string;
   expandedKeys?: FemsqTreeKey[];
@@ -271,6 +273,34 @@ export declare function treeListColumnTracks(
   columns: readonly { width?: string }[],
   hasActions: boolean
 ): string;
+
+export interface FemsqTreeListColumnSet<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
+  level: string;
+  columns: FemsqTreeListColumn<Node>[];
+}
+
+export declare function treeListSetTrackCount(
+  sets: readonly { columns: readonly unknown[] }[] | undefined | null
+): number;
+
+export declare function treeListSetLabels(
+  set: { columns: readonly { label: string }[] } | undefined,
+  trackCount: number
+): string[];
+
+export declare function treeListSetForNode<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  sets: readonly FemsqTreeListColumnSet<Node>[] | undefined | null
+): FemsqTreeListColumnSet<Node> | undefined;
+
+export declare function treeListSetLevel<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  sets: readonly FemsqTreeListColumnSet<Node>[] | undefined | null
+): string | undefined;
+
+export declare function treeListGroupCaptionFlags(
+  levels: readonly (string | undefined | null)[]
+): boolean[];
 
 export type FemsqWalkView = 'outline' | 'list';
 

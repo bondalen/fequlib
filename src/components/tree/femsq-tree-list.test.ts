@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { treeListCellText, treeListLevelMatches, treeListRowIndentPx, treeListShowsToggle, walkNodeLevel } from './femsq-tree-list';
+import {
+  treeListCellText,
+  treeListGroupCaptionFlags,
+  treeListLevelMatches,
+  treeListRowIndentPx,
+  treeListSetForNode,
+  treeListSetLabels,
+  treeListSetTrackCount,
+  treeListShowsToggle,
+  walkNodeLevel
+} from './femsq-tree-list';
 import { assignWalkListFields, resolveWalkView, usesWalkList, walkColumnsToTreeList } from './femsq-walk-view';
 
 describe('treeListRowIndentPx', () => {
@@ -119,5 +129,53 @@ describe('walkColumnsToTreeList', () => {
       ]
     );
     expect(node).toEqual({ id: 'r:1', kind: 'record', title: 'из строки' });
+  });
+});
+
+describe('columnSets', () => {
+  const label = { name: 'label', label: 'Подпись', field: 'label' };
+  const code = { name: 'code', label: 'Код', field: 'code' };
+  const sum = { name: 'sum', label: 'Сумма', field: 'sum' };
+  const sets = [
+    { level: 'site', columns: [label, code] },
+    { level: 'point', columns: [label, code, sum] }
+  ];
+
+  it('uses the widest set, not the sum of columns', () => {
+    expect(treeListSetTrackCount(sets)).toBe(3);
+    expect(sets[0].columns.length + sets[1].columns.length).toBe(5);
+  });
+
+  it('leaves the right-hand label empty for a shorter set', () => {
+    expect(treeListSetLabels(sets[0], treeListSetTrackCount(sets))).toEqual(['Подпись', 'Код', '']);
+    expect(treeListSetLabels(sets[1], 3)).toEqual(['Подпись', 'Код', 'Сумма']);
+  });
+
+  it('captions only the first sibling of a level and starts again when the level changes', () => {
+    const nodes = [
+      { level: 'site' },
+      { level: 'site' },
+      { level: 'point' },
+      { level: 'point' },
+      { level: 'site' }
+    ];
+    expect(treeListGroupCaptionFlags(nodes.map((node) => treeListSetForNode(node, sets)?.level))).toEqual([
+      true,
+      false,
+      true,
+      false,
+      true
+    ]);
+  });
+
+  it('matches table and edge by kind only when node.level is absent', () => {
+    const structural = [
+      { level: 'table', columns: [label] },
+      { level: 'edge', columns: [label, code] }
+    ];
+    expect(treeListSetForNode({ kind: 'record' }, structural)?.level).toBe('table');
+    expect(treeListSetForNode({ kind: 'folder' }, structural)?.level).toBe('edge');
+    expect(treeListSetForNode({ kind: 'record', level: 'site' }, structural)).toBeUndefined();
+    expect(treeListGroupCaptionFlags(['table', 'table', 'edge'])).toEqual([true, false, true]);
   });
 });

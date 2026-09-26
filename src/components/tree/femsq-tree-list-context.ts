@@ -1,7 +1,7 @@
 import type { InjectionKey } from 'vue';
 
 import type { FemsqTreeKey, FemsqTreeNodeBase, FemsqTreeNodeKey } from './femsq-tree';
-import type { FemsqTreeListColumn } from './femsq-tree-list';
+import type { FemsqTreeListColumn, FemsqTreeListColumnSet } from './femsq-tree-list';
 
 export interface FemsqTreeListContext<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
   nodeKey: FemsqTreeNodeKey<Node>;
@@ -9,6 +9,9 @@ export interface FemsqTreeListContext<Node extends FemsqTreeNodeBase = FemsqTree
   leafKey: string;
   indent: number;
   columns: FemsqTreeListColumn<Node>[];
+  columnSets: FemsqTreeListColumnSet<Node>[];
+  useColumnSets: boolean;
+  trackCount: number;
   hasActions: boolean;
   expandOnClick: boolean;
   selectable: boolean;

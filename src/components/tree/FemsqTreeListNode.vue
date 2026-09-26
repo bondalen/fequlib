@@ -6,10 +6,10 @@
       @click="onRowClick"
     >
       <div
-        v-for="(column, index) in ctx.columns"
-        :key="column.name"
+        v-for="(cell, index) in rowCells"
+        :key="cell?.name ?? `track-${index}`"
         class="femsq-tree-list__cell"
-        :style="cellStyle(column)"
+        :style="cell ? cellStyle(cell) : undefined"
       >
         <template v-if="index === 0">
           <span class="femsq-tree-list__indent" :style="indentStyle" />
@@ -28,7 +28,7 @@
             </slot>
           </span>
         </template>
-        <span class="femsq-tree-list__cell-text">{{ cellText(column) }}</span>
+        <span class="femsq-tree-list__cell-text">{{ cell ? cellText(cell) : '' }}</span>
       </div>
       <div v-if="ctx.hasActions" class="femsq-tree-list__cell femsq-tree-list__cell--actions" @click.stop>
         <slot name="actions" v-bind="nodeSlotProps" />
@@ -44,17 +44,15 @@
       <div v-else-if="!childNodes || childNodes.length === 0" class="femsq-tree-list__status femsq-tree-list__empty">
         <slot name="empty" v-bind="statusSlotProps">—</slot>
       </div>
-      <FemsqTreeListNode
+      <FemsqTreeListSiblings
         v-else
-        v-for="child in childNodes"
-        :key="String(childKey(child))"
-        :node="child"
+        :nodes="childNodes"
         :depth="depth + 1"
       >
         <template v-for="slotName in slotNames" :key="slotName" #[slotName]="slotProps: Record<string, unknown>">
           <slot :name="slotName" v-bind="bindSlot(slotProps)" />
         </template>
-      </FemsqTreeListNode>
+      </FemsqTreeListSiblings>
     </div>
   </div>
 </template>
@@ -67,10 +65,16 @@
 import { computed, inject, useSlots } from 'vue';
 import { QBtn, QSpinner } from 'quasar';
 
+import FemsqTreeListSiblings from './FemsqTreeListSiblings.vue';
 import { femsqTreeListContextKey } from './femsq-tree-list-context';
 import { getChildren, getNodeKey, type FemsqTreeKey, type FemsqTreeNodeBase } from './femsq-tree';
-import { treeListCellText, treeListRowIndentPx, treeListShowsToggle, type FemsqTreeListColumn } from './femsq-tree-list';
-import FemsqTreeListNode from './FemsqTreeListNode.vue';
+import {
+  treeListCellText,
+  treeListRowIndentPx,
+  treeListSetForNode,
+  treeListShowsToggle,
+  type FemsqTreeListColumn
+} from './femsq-tree-list';
 
 defineOptions({
   name: 'FemsqTreeListNode'
@@ -131,6 +135,19 @@ const indentStyle = computed(() => ({
   width: `${treeListRowIndentPx(props.depth, ctx.indent)}px`
 }));
 
+const rowCells = computed(() => {
+  if (!ctx.useColumnSets) {
+    return ctx.columns;
+  }
+  const set = treeListSetForNode(props.node, ctx.columnSets);
+  const cells: Array<FemsqTreeListColumn | undefined> = [];
+  for (let index = 0; index < ctx.trackCount; index += 1) {
+    const column = set?.columns[index];
+    cells.push(column ? { ...column, level: undefined } : undefined);
+  }
+  return cells;
+});
+
 function cellText(column: FemsqTreeListColumn): string {
   return treeListCellText(props.node, column);
 }
@@ -140,10 +157,6 @@ function cellStyle(column: FemsqTreeListColumn): Record<string, string> | undefi
     return undefined;
   }
   return { textAlign: column.align };
-}
-
-function childKey(child: FemsqTreeNodeBase): FemsqTreeKey {
-  return getNodeKey(child, ctx.nodeKey);
 }
 
 function runToggle(): void {

@@ -119,3 +119,91 @@ export function treeListColumnTracks(
   }
   return tracks.join(' ');
 }
+
+/** Комплект колонок одной ветви. Уровень задаёт комплект, не `column.level`. */
+export interface FemsqTreeListColumnSet<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
+  /** Метка ветви, `node.level`, либо зарезервированные `table` / `edge`. */
+  level: string;
+  columns: FemsqTreeListColumn<Node>[];
+}
+
+/**
+ * Число дорожек данных: максимум ширин комплектов, не их сумма.
+ * Колонка действий сюда не входит.
+ */
+export function treeListSetTrackCount(
+  sets: readonly { columns: readonly unknown[] }[] | undefined | null
+): number {
+  if (!sets || sets.length === 0) {
+    return 0;
+  }
+  return sets.reduce((max, set) => Math.max(max, set.columns.length), 0);
+}
+
+/**
+ * Подписи комплекта по дорожкам. У короткого комплекта справа пустые строки.
+ */
+export function treeListSetLabels(
+  set: { columns: readonly { label: string }[] } | undefined,
+  trackCount: number
+): string[] {
+  const count = Number.isFinite(trackCount) && trackCount > 0 ? Math.floor(trackCount) : 0;
+  const labels: string[] = [];
+  for (let index = 0; index < count; index += 1) {
+    labels.push(set?.columns[index]?.label ?? '');
+  }
+  return labels;
+}
+
+/**
+ * Комплект узла. Явный `node.level` важнее `kind`.
+ * `table` / `edge` по `kind` — только если метки ветви нет.
+ */
+export function treeListSetForNode<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  sets: readonly FemsqTreeListColumnSet<Node>[] | undefined | null
+): FemsqTreeListColumnSet<Node> | undefined {
+  if (!sets || sets.length === 0) {
+    return undefined;
+  }
+  const explicit = node.level;
+  if (typeof explicit === 'string' && explicit !== '') {
+    return sets.find((set) => set.level === explicit);
+  }
+  const structural = walkNodeLevel(node);
+  if (!structural) {
+    return undefined;
+  }
+  return sets.find((set) => set.level === structural);
+}
+
+/** Уровень комплекта, который рисует узел. Нет комплекта — подписи нет. */
+export function treeListSetLevel<Node extends FemsqTreeNodeBase>(
+  node: Node,
+  sets: readonly FemsqTreeListColumnSet<Node>[] | undefined | null
+): string | undefined {
+  return treeListSetForNode(node, sets)?.level;
+}
+
+/**
+ * Перед каким соседом рисовать строку подписей.
+ * Группа — подряд идущие соседи одного комплекта. Смена уровня начинает новую.
+ */
+export function treeListGroupCaptionFlags(levels: readonly (string | undefined | null)[]): boolean[] {
+  const flags: boolean[] = [];
+  let previous: string | undefined;
+  let hasPrevious = false;
+  for (const level of levels) {
+    const current = typeof level === 'string' && level !== '' ? level : undefined;
+    if (!current) {
+      flags.push(false);
+      previous = undefined;
+      hasPrevious = false;
+      continue;
+    }
+    flags.push(!hasPrevious || current !== previous);
+    previous = current;
+    hasPrevious = true;
+  }
+  return flags;
+}

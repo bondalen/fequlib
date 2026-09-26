@@ -14,7 +14,7 @@
       <slot name="empty" :depth="0">—</slot>
     </div>
     <div v-else class="femsq-tree-list__scroll">
-      <div class="femsq-tree-list__header femsq-tree-list__line">
+      <div v-if="!useColumnSets" class="femsq-tree-list__header femsq-tree-list__line">
         <div
           v-for="(column, index) in columns"
           :key="column.name"
@@ -26,11 +26,11 @@
         </div>
         <div v-if="hasActions" class="femsq-tree-list__cell femsq-tree-list__cell--actions" />
       </div>
-      <FemsqTreeListNode v-for="node in nodes" :key="String(nodeKeyOf(node))" :node="node" :depth="0">
+      <FemsqTreeListSiblings :nodes="nodes" :depth="0">
         <template v-for="(_, slotName) in forwardedSlots" :key="String(slotName)" #[slotName]="slotProps">
           <slot :name="slotName" v-bind="slotProps || {}" />
         </template>
-      </FemsqTreeListNode>
+      </FemsqTreeListSiblings>
     </div>
   </div>
 </template>
@@ -44,11 +44,10 @@
 import { computed, provide, ref, useAttrs, useSlots } from 'vue';
 import { QSpinner } from 'quasar';
 
-import FemsqTreeListNode from './FemsqTreeListNode.vue';
+import FemsqTreeListSiblings from './FemsqTreeListSiblings.vue';
 import { femsqTreeListContextKey, type FemsqTreeListContext } from './femsq-tree-list-context';
 import {
   getLoadReason,
-  getNodeKey,
   keyListIncludes,
   shouldLoad,
   toggleKeyInList,
@@ -57,7 +56,7 @@ import {
   type FemsqTreeLoadPayload,
   type FemsqTreeNodeKey
 } from './femsq-tree';
-import { treeListColumnTracks, type FemsqTreeListColumn } from './femsq-tree-list';
+import { treeListColumnTracks, treeListSetTrackCount, type FemsqTreeListColumn, type FemsqTreeListColumnSet } from './femsq-tree-list';
 
 defineOptions({
   name: 'FemsqTreeList',
@@ -68,7 +67,12 @@ const props = withDefaults(
   defineProps<{
     nodes: Node[];
     nodeKey: FemsqTreeNodeKey<Node>;
-    columns: FemsqTreeListColumn<Node>[];
+    columns?: FemsqTreeListColumn<Node>[];
+    /**
+     * Комплекты колонок ветвей. Пока нет — одна липкая шапка из `columns`.
+     * Дорожек столько, сколько колонок у самого широкого комплекта.
+     */
+    columnSets?: FemsqTreeListColumnSet<Node>[];
     childrenKey?: string;
     leafKey?: string;
     expandedKeys?: FemsqTreeKey[];
@@ -86,6 +90,8 @@ const props = withDefaults(
     fill?: boolean;
   }>(),
   {
+    columns: () => [],
+    columnSets: () => [],
     childrenKey: 'children',
     leafKey: 'leaf',
     expandedKeys: undefined,
@@ -133,10 +139,18 @@ const rootAttrs = computed(() => {
   return rest;
 });
 
+const useColumnSets = computed(() => (props.columnSets?.length ?? 0) > 0);
+const trackCount = computed(() =>
+  useColumnSets.value ? treeListSetTrackCount(props.columnSets) : props.columns.length
+);
+
 const rootStyle = computed(() => {
+  const layoutColumns = useColumnSets.value
+    ? Array.from({ length: trackCount.value }, () => ({}))
+    : props.columns;
   const indentVar = {
     '--fequlib-tree-indent': `${props.indent}px`,
-    '--fequlib-tree-list-columns': treeListColumnTracks(props.columns, hasActions.value)
+    '--fequlib-tree-list-columns': treeListColumnTracks(layoutColumns, hasActions.value)
   };
   const fromAttrs = (attrs as Record<string, unknown>).style;
   if (fromAttrs && typeof fromAttrs === 'object' && !Array.isArray(fromAttrs)) {
@@ -151,10 +165,6 @@ const rootStyle = computed(() => {
 const showRootLoading = computed(
   () => props.nodes.length === 0 && loadingKeysModel.value.length > 0
 );
-
-function nodeKeyOf(node: Node): FemsqTreeKey {
-  return getNodeKey(node, props.nodeKey);
-}
 
 function headerCellStyle(column: FemsqTreeListColumn<Node>): Record<string, string> | undefined {
   if (!column.align) {
@@ -239,6 +249,15 @@ const listContext: FemsqTreeListContext<Node> = {
   get columns() {
     return props.columns;
   },
+  get columnSets() {
+    return props.columnSets;
+  },
+  get useColumnSets() {
+    return useColumnSets.value;
+  },
+  get trackCount() {
+    return trackCount.value;
+  },
   get hasActions() {
     return hasActions.value;
   },
@@ -310,6 +329,17 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
   color: inherit;
   font-weight: 600;
   border-bottom: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+}
+
+:deep(.femsq-tree-list__set-labels) {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+  min-height: var(--fequlib-tree-row-height, 32px);
+  color: inherit;
+  font-weight: 600;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
 }
 
 :deep(.femsq-tree-list__cell) {
