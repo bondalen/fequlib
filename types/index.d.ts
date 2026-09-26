@@ -329,6 +329,183 @@ export declare function assignWalkListFields<Node extends FemsqTreeNodeBase>(
   columns: readonly FemsqWalkListColumn[]
 ): Node;
 
+export type FemsqWalkCard = 'N:1' | '1:1' | '1:N';
+
+export type FemsqWalkValueKind = 'money';
+
+export type FemsqWalkValueKinds = Record<string, FemsqWalkValueKind>;
+
+export interface FemsqWalkActionSpec {
+  id: string;
+  kind:
+    | 'create-child'
+    | 'link-related'
+    | 'unlink-related'
+    | 'open-form'
+    | 'navigate'
+    | 'delete-record';
+  label: string;
+  icon?: string;
+  scope?: 'record' | 'folder' | 'both';
+  modal?: 'record' | 'none';
+  form?: string;
+  visibleWhen?: {
+    nodeKind?: 'record' | 'folder';
+    edge?: string;
+    table?: string;
+  };
+}
+
+export interface FemsqWalkChildSpec {
+  edge?: string;
+  queryId?: string;
+  to: string;
+  card: FemsqWalkCard;
+  folder?: string;
+  title: string[];
+  detail: string[] | '*';
+  valueKinds?: FemsqWalkValueKinds;
+  actions?: FemsqWalkActionSpec[];
+  children: FemsqWalkChildSpec[];
+  level?: string;
+}
+
+export interface FemsqWalkColumnSet {
+  level: string;
+  columns: FemsqWalkListColumn[];
+}
+
+export interface FemsqWalkTreeSpec {
+  id: string;
+  version: number;
+  root: { table: string; pk: string; queryId?: string; level?: string };
+  title: string[];
+  detail: string[] | '*';
+  valueKinds?: FemsqWalkValueKinds;
+  view?: FemsqWalkView;
+  columns?: FemsqWalkListColumn[];
+  columnSets?: FemsqWalkColumnSet[];
+  actions?: FemsqWalkActionSpec[];
+  children: FemsqWalkChildSpec[];
+}
+
+export interface FemsqWalkField {
+  label: string;
+  value: string;
+}
+
+export interface FemsqWalkFetchRow {
+  key: number;
+  fields: Array<{ name: string; value: string | null }>;
+}
+
+export type FemsqWalkFetchNode = (table: string, id: number) => Promise<FemsqWalkFetchRow | null>;
+
+export type FemsqWalkFetchExpand = (edge: string, fromId: number) => Promise<FemsqWalkFetchRow[]>;
+
+export type FemsqWalkFetchQuery = (queryId: string, fromId: number) => Promise<FemsqWalkFetchRow[]>;
+
+export type FemsqWalkFetchRoots = (queryId: string) => Promise<FemsqWalkFetchRow[]>;
+
+export interface FemsqWalkNode extends FemsqTreeNodeBase {
+  id: string;
+  kind: 'record' | 'folder';
+  title: string;
+  fields: FemsqWalkField[];
+  actions?: FemsqWalkActionSpec[];
+  children?: FemsqWalkNode[];
+  leaf?: boolean;
+  table?: string;
+  rowKey?: number;
+  childSpecs?: FemsqWalkChildSpec[];
+  edge?: string;
+  queryId?: string;
+  fromId?: number;
+  folderSpec?: FemsqWalkChildSpec;
+  level?: string;
+}
+
+export interface FemsqWalkActionContext {
+  actionId: string;
+  root: { table: string; id: number | null };
+  node: {
+    kind: 'record' | 'folder';
+    table: string | null;
+    edge: string | null;
+    fromId: number | null;
+    rowKey: number | null;
+    title: string;
+    fields: Record<string, string | null>;
+  };
+}
+
+export declare function walkUsesForest(
+  spec: Pick<FemsqWalkTreeSpec, 'root'>,
+  rootId: number | null | undefined,
+  fetchRoots: FemsqWalkFetchRoots | undefined
+): boolean;
+
+export declare function walkReloadToken(
+  spec: Pick<FemsqWalkTreeSpec, 'root'>,
+  rootId: number | null | undefined,
+  rootsToken: string | undefined,
+  fetchRoots: FemsqWalkFetchRoots | undefined
+): string;
+
+export declare function walkListUsesColumnSets(spec: FemsqWalkTreeSpec): boolean;
+
+export declare function walkListColumnSetsOf(spec: FemsqWalkTreeSpec): FemsqTreeListColumnSet[] | undefined;
+
+export declare function walkFlatListColumns(spec: FemsqWalkTreeSpec): FemsqWalkListColumn[] | undefined;
+
+export declare function walkTreeListColumns(spec: FemsqWalkTreeSpec): FemsqTreeListColumn[];
+
+export declare function buildWalkRecordNode(
+  table: string,
+  rowKey: number,
+  fields: Record<string, string | null>,
+  spec: Pick<FemsqWalkChildSpec, 'title' | 'detail' | 'children' | 'actions' | 'valueKinds' | 'level'>,
+  treeSpec: FemsqWalkTreeSpec
+): FemsqWalkNode;
+
+export declare function buildWalkFolderNode(
+  parentId: string,
+  fromId: number,
+  spec: FemsqWalkChildSpec,
+  treeSpec: FemsqWalkTreeSpec
+): FemsqWalkNode;
+
+export declare function walkChildrenAfterRecordLoad(
+  parent: FemsqWalkNode,
+  loaded: Record<string, Array<{ key: number; fields: Record<string, string | null> }>>,
+  treeSpec: FemsqWalkTreeSpec
+): FemsqWalkNode[];
+
+export declare function walkChildrenAfterFolderLoad(
+  folder: FemsqWalkNode,
+  rows: Array<{ key: number; fields: Record<string, string | null> }>,
+  treeSpec: FemsqWalkTreeSpec
+): FemsqWalkNode[];
+
+export declare function createWalkActionContext(
+  rootTable: string,
+  rootId: number | null,
+  node: FemsqWalkNode,
+  action: FemsqWalkActionSpec
+): FemsqWalkActionContext;
+
+export declare const FemsqWalkTree: (props: {
+  spec: FemsqWalkTreeSpec;
+  rootId?: number | null;
+  rootsToken?: string;
+  fetchNode: FemsqWalkFetchNode;
+  fetchExpand: FemsqWalkFetchExpand;
+  fetchQuery?: FemsqWalkFetchQuery;
+  fetchRoots?: FemsqWalkFetchRoots;
+  rootClass?: string;
+  dataTest?: string;
+} & Record<string, unknown>) => any;
+
 export type ChartKind = 'line' | 'bar' | 'combo';
 export type ChartXType = 'time' | 'category';
 

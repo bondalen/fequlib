@@ -71,3 +71,29 @@ export {
   type FemsqWalkSpecView,
   type FemsqWalkView
 } from './components/tree/femsq-walk-view';
+export { default as FemsqWalkTree } from './components/tree/FemsqWalkTree.vue';
+export {
+  buildWalkFolderNode,
+  buildWalkRecordNode,
+  createWalkActionContext,
+  walkChildrenAfterFolderLoad,
+  walkChildrenAfterRecordLoad,
+  walkFlatListColumns,
+  walkListColumnSetsOf,
+  walkListUsesColumnSets,
+  walkReloadToken,
+  walkTreeListColumns,
+  walkUsesForest,
+  type FemsqWalkActionContext,
+  type FemsqWalkActionSpec,
+  type FemsqWalkCard,
+  type FemsqWalkChildSpec,
+  type FemsqWalkColumnSet,
+  type FemsqWalkFetchExpand,
+  type FemsqWalkFetchNode,
+  type FemsqWalkFetchQuery,
+  type FemsqWalkFetchRoots,
+  type FemsqWalkFetchRow,
+  type FemsqWalkNode,
+  type FemsqWalkTreeSpec
+} from './components/tree/femsq-walk-tree';

@@ -5,6 +5,7 @@
 | [components/FemsqTable.md](./components/FemsqTable.md) | Контракт `FemsqTable` (функционал + known gaps) |
 | [components/FemsqTree.md](./components/FemsqTree.md) | Контракт `FemsqTree` v1 (nested outline; header-click toggles `selectedKey`) |
 | [components/FemsqTreeList.md](./components/FemsqTreeList.md) | Контракт `FemsqTreeList` (колонки на ядре дерева; `view: list` у обходчика) |
+| [components/FemsqWalkTree.md](./components/FemsqWalkTree.md) | Контракт `FemsqWalkTree` (JSON → outline или список) |
 | [components/FemsqChart.md](./components/FemsqChart.md) | Контракт `FemsqChart` (ECharts 5, `ChartSpec`, `fill`) |
 | [components/format-money.md](./components/format-money.md) | `formatMoney`, `valueKind: 'money'`, `moneyColumn` (v0.1.2) |
 | [design/FemsqTable-visual-target.md](./design/FemsqTable-visual-target.md) | Распределение дизайна хост↔lib; DX как эталон хроматики |
@@ -16,6 +17,7 @@
 | [chat-plan-26-0809-docs-registry-vps.md](./development/notes/chats/chat-plan/chat-plan-26-0809-docs-registry-vps.md) | docs-registry → VPS (M0–M6 ✅) |
 | [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) | `FemsqTree` v1 (задача **0016**) |
 | [chat-plan-26-0926-femsq-tree-list.md](./development/notes/chats/chat-plan/chat-plan-26-0926-femsq-tree-list.md) | `FemsqTreeList` (задача **0018**) |
+| [chat-plan-26-0926-femsq-walk-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0926-femsq-walk-tree.md) | `FemsqWalkTree` (локально, пакет **0.1.6**) |
 | [chat-plan-26-0824-fill-layout.md](./development/notes/chats/chat-plan/chat-plan-26-0824-fill-layout.md) | Срез **0012**: prop `fill` Table+Tree |
 | [chat-plan-26-0828-femsq-chart.md](./development/notes/chats/chat-plan/chat-plan-26-0828-femsq-chart.md) | **`FemsqChart` v1** (задача **0017**) |
 | [chat-resume-26-0809-sudz-gaps-registry-vps.md](./development/notes/chats/chat-resume/chat-resume-26-0809-sudz-gaps-registry-vps.md) | Резюме чата 2026-08-08…09 |
