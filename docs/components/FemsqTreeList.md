@@ -42,11 +42,11 @@ Controlled / uncontrolled — как у `FemsqTree`. `inheritAttrs: false`.
 | `format?` | `(value, node) => string` |
 | `align?` | `left` / `right` / `center` |
 | `width?` | трек CSS grid; иначе `minmax(0, 1fr)` |
-| `level?` | `'table'` (`kind: 'record'`) или `'edge'` (`kind: 'folder'`). Нет совпадения — ячейка пустая |
+| `level?` | нет — поле на любом узле; `"table"` / `"edge"` — по `kind` (`record` / `folder`); любая другая строка — только если `node.level` равен ей |
 
-Первая колонка: отступ `depth * indent` и слот кнопки. У листа кнопка скрыта, слот той же ширины (`--fequlib-tree-list-toggle`, 28px), колонки не прыгают.
+Первая колонка общая: отступ `depth * indent` и слот кнопки, без своей шапки на глубину. Её `level` хост не задаёт. У листа кнопка скрыта, слот той же ширины (`--fequlib-tree-list-toggle`, 28px), колонки не прыгают.
 
-Нет поля, `null` или `''` — ячейка пустая. `0` показывается. Уровни разнородные: колонка с `level` не заполняется на другом уровне, даже если имя поля совпало.
+Нет поля, `null` или `''` — ячейка пустая, в том числе когда метка ветви совпала. `0` показывается. Шапка одна на всё дерево: колонки с разными `level` стоят рядом. Одинаковое имя поля на двух ветвях разводится разными метками. Нет `node.level` — колонка с произвольной меткой пустая. `"table"` и `"edge"` зарезервированы и смотрят на `kind`, не на строку `node.level`.
 
 ## Слоты
 
@@ -69,6 +69,7 @@ Controlled / uncontrolled — как у `FemsqTree`. `inheritAttrs: false`.
 type Row = {
   id: string;
   kind?: 'record' | 'folder';
+  level?: string;
   label?: string;
   code?: string;
   children?: Row[];
@@ -77,11 +78,12 @@ type Row = {
 
 const columns = [
   { name: 'label', label: 'Подпись', field: 'label' },
-  { name: 'code', label: 'Ключ', field: 'code', level: 'table' }
+  { name: 'site-code', label: 'Код стройки', field: 'code', level: 'site' },
+  { name: 'point-code', label: 'Код точки', field: 'code', level: 'point' }
 ];
 ```
 
-У записи `{ kind: 'record', label: 'Север', code: '12' }` ключ виден. У папки `{ kind: 'folder', label: 'коды' }` ключ пустой. У записи без `code` ячейка пустая.
+У `{ kind: 'record', level: 'site', label: 'Север', code: '12' }` код стройки `12`, код точки пустой. У `{ kind: 'record', level: 'point', label: '051-1', code: '9', leaf: true }` наоборот. Колонка `"table"` по-прежнему видна у `kind: 'record'` и пуста у `kind: 'folder'`.
 
 ```vue
 <FemsqTreeList
@@ -109,7 +111,7 @@ const columns = [
 | нет поля, `outline`, любое другое | как сейчас: `title` в шапке `FemsqTree`, `fields` в `#detail` |
 | `list` | `FemsqTreeList` и `columns` |
 
-Колонка JSON (`FemsqWalkListColumn`): `label`, `field`, необязательный `level` (`table` / `edge`). Формат-функцию в JSON не кладут; при необходимости хост передаёт `format` уже в `FemsqTreeListColumn`.
+Колонка JSON (`FemsqWalkListColumn`): `label`, `field`, необязательный `level` — та же строка, что у `FemsqTreeListColumn` (`table`, `edge` или метка ветви). `walkColumnsToTreeList` её не отбрасывает. Формат-функцию в JSON не кладут.
 
 ```ts
 resolveWalkView(undefined); // 'outline'
@@ -121,7 +123,7 @@ const node = assignWalkListFields(recordNode, fieldMap, spec.columns ?? []);
 
 `fetchNode` / `fetchExpand` этот модуль не принимает и не меняет. Фильтр корня (хвост кода, очередь) в JSON и в lib не входит: хост передаёт его в загрузку корня так же, как `rootId`. Существующие JSON без `view` остаются outline.
 
-Узел list: те же `id` / `children` / `leaf` / `kind`, плюс поля строки, которые читают колонки. `kind: 'record' | 'folder'` нужен, только если у колонки задан `level`.
+Узел list: те же `id` / `children` / `leaf` / `kind`, плюс необязательный `level` (метка ветви) и поля строки, которые читают колонки. `kind: 'record' | 'folder'` нужен для колонок `"table"` / `"edge"`. Для произвольной метки нужен `node.level`. `assignWalkListFields` по-прежнему не затирает уже лежащие поля пустым значением.
 
 ## Не входит в v1
 

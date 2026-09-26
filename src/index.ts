@@ -48,11 +48,13 @@ export { default as FemsqTreeList } from './components/tree/FemsqTreeList.vue';
 export {
   treeListCellText,
   treeListColumnTracks,
+  treeListLevelMatches,
   treeListRowIndentPx,
   treeListShowsToggle,
   walkNodeLevel,
   type FemsqTreeListColumn,
-  type FemsqTreeListLevel
+  type FemsqTreeListLevel,
+  type FemsqTreeListStructuralLevel
 } from './components/tree/femsq-tree-list';
 export {
   assignWalkListFields,

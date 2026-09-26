@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { treeListCellText, treeListRowIndentPx, treeListShowsToggle, walkNodeLevel } from './femsq-tree-list';
+import { treeListCellText, treeListLevelMatches, treeListRowIndentPx, treeListShowsToggle, walkNodeLevel } from './femsq-tree-list';
 import { assignWalkListFields, resolveWalkView, usesWalkList, walkColumnsToTreeList } from './femsq-walk-view';
 
 describe('treeListRowIndentPx', () => {
@@ -50,6 +50,29 @@ describe('treeListCellText', () => {
     expect(treeListCellText(record, keyCol)).toBe('900001');
     expect(treeListCellText({ code: '900001' }, keyCol)).toBe('');
   });
+
+  it('fills a branch label only when node.level matches', () => {
+    const siteCode = { name: 'code-site', label: 'Код стройки', field: 'code', level: 'site' };
+    const pointCode = { name: 'code-point', label: 'Код точки', field: 'code', level: 'point' };
+    const site = { id: 'a', kind: 'record', level: 'site', label: 'Север', code: '12' };
+    const point = { id: 'b', kind: 'record', level: 'point', label: '051-1', code: '9', leaf: true };
+    const label = { name: 'label', label: 'Подпись', field: 'label' };
+
+    expect(treeListCellText(site, label)).toBe('Север');
+    expect(treeListCellText(site, siteCode)).toBe('12');
+    expect(treeListCellText(site, pointCode)).toBe('');
+    expect(treeListCellText(point, siteCode)).toBe('');
+    expect(treeListCellText(point, pointCode)).toBe('9');
+    expect(treeListCellText({ kind: 'record', code: '12' }, siteCode)).toBe('');
+    expect(treeListLevelMatches(site, 'site')).toBe(true);
+    expect(treeListLevelMatches(site, 'point')).toBe(false);
+    expect(treeListLevelMatches(point, 'table')).toBe(true);
+  });
+
+  it('still leaves the cell empty when the field is missing on a matching label', () => {
+    const siteCode = { name: 'code-site', label: 'Код стройки', field: 'code', level: 'site' };
+    expect(treeListCellText({ kind: 'record', level: 'site' }, siteCode)).toBe('');
+  });
 });
 
 describe('resolveWalkView', () => {
@@ -78,6 +101,12 @@ describe('walkColumnsToTreeList', () => {
       { name: 'title-0', label: 'Подпись', field: 'title', level: undefined },
       { name: 'code-1', label: 'Ключ', field: 'code', level: 'table' }
     ]);
+    expect(
+      walkColumnsToTreeList([
+        { label: 'Код стройки', field: 'code', level: 'site' },
+        { label: 'Код точки', field: 'code', level: 'point' }
+      ]).map((column) => column.level)
+    ).toEqual(['site', 'point']);
   });
 
   it('copies present row fields onto the node and skips blanks', () => {

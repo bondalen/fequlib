@@ -207,7 +207,10 @@ export declare function shouldLoad<Node extends FemsqTreeNodeBase>(
 
 export declare function getLoadReason(alreadyRequested: boolean): FemsqTreeLoadReason;
 
-export type FemsqTreeListLevel = 'table' | 'edge';
+/** Метка ветви или зарезервированные `table` / `edge`. */
+export type FemsqTreeListLevel = string;
+
+export type FemsqTreeListStructuralLevel = 'table' | 'edge';
 
 export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
   name: string;
@@ -216,7 +219,10 @@ export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeN
   align?: 'left' | 'right' | 'center';
   width?: string;
   format?: (value: unknown, node: Node) => string;
-  /** `record` → table, `folder` → edge. Нет совпадения — ячейка пустая. */
+  /**
+   * Нет значения — поле на любом узле.
+   * `table` / `edge` — по `kind`. Иная строка — только если `node.level` равен ей.
+   */
   level?: FemsqTreeListLevel;
 }
 
@@ -249,7 +255,12 @@ export declare function treeListShowsToggle<Node extends FemsqTreeNodeBase>(
   leafKey?: string
 ): boolean;
 
-export declare function walkNodeLevel(node: FemsqTreeNodeBase): FemsqTreeListLevel | undefined;
+export declare function walkNodeLevel(node: FemsqTreeNodeBase): FemsqTreeListStructuralLevel | undefined;
+
+export declare function treeListLevelMatches(
+  node: FemsqTreeNodeBase,
+  level: string | undefined | null
+): boolean;
 
 export declare function treeListCellText<Node extends FemsqTreeNodeBase>(
   node: Node,

@@ -5,8 +5,14 @@
 
 import { isLeaf, type FemsqTreeNodeBase } from './femsq-tree';
 
-/** Уровень узла обходчика, на котором колонка заполняется. */
-export type FemsqTreeListLevel = 'table' | 'edge';
+/**
+ * `table` / `edge` — по `kind` узла.
+ * Любая другая строка — метка ветви: ячейка непустая только при `node.level === level`.
+ */
+export type FemsqTreeListLevel = string;
+
+/** Зарезервированные значения `column.level`: не метки ветви. */
+export type FemsqTreeListStructuralLevel = 'table' | 'edge';
 
 export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
   /** Стабильное имя колонки (ключ в шапке и строке). */
@@ -23,8 +29,8 @@ export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeN
    */
   format?: (value: unknown, node: Node) => string;
   /**
-   * Если задан — ячейка непустая только у узла этого уровня
-   * (`kind: 'record'` → `table`, `kind: 'folder'` → `edge`).
+   * Если задан — ячейка непустая только на этом уровне.
+   * `table` / `edge` смотрят на `kind`. Иная строка — на `node.level`.
    */
   level?: FemsqTreeListLevel;
 }
@@ -50,10 +56,10 @@ export function treeListShowsToggle<Node extends FemsqTreeNodeBase>(
 }
 
 /**
- * `record` / table — строка записи. `folder` — узел ребра.
- * Без `kind` уровень неизвестен: колонка с `level` остаётся пустой.
+ * `record` → `table`, `folder` → `edge`.
+ * Метку ветви (`node.level`) эта функция не читает.
  */
-export function walkNodeLevel(node: FemsqTreeNodeBase): FemsqTreeListLevel | undefined {
+export function walkNodeLevel(node: FemsqTreeNodeBase): FemsqTreeListStructuralLevel | undefined {
   if (node.kind === 'folder') {
     return 'edge';
   }
@@ -64,13 +70,27 @@ export function walkNodeLevel(node: FemsqTreeNodeBase): FemsqTreeListLevel | und
 }
 
 /**
+ * Совпадает ли узел с `column.level`.
+ * Нет level — да. `table` / `edge` — по `kind`. Иная строка — строгое равенство с `node.level`.
+ */
+export function treeListLevelMatches(node: FemsqTreeNodeBase, level: string | undefined | null): boolean {
+  if (level == null || level === '') {
+    return true;
+  }
+  if (level === 'table' || level === 'edge') {
+    return walkNodeLevel(node) === level;
+  }
+  return node.level === level;
+}
+
+/**
  * Текст ячейки. Пусто, если поля нет, значение null/'' или уровень колонки не совпал.
  */
 export function treeListCellText<Node extends FemsqTreeNodeBase>(
   node: Node,
   column: FemsqTreeListColumn<Node>
 ): string {
-  if (column.level && walkNodeLevel(node) !== column.level) {
+  if (!treeListLevelMatches(node, column.level)) {
     return '';
   }
   const value = node[column.field];
