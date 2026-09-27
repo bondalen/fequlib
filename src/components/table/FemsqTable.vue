@@ -465,23 +465,71 @@ function buildRequest(
   };
 }
 
+function paginationRequestKey(
+  pagination: NonNullable<QTableProps['pagination']>
+): string {
+  return JSON.stringify({
+    page: pagination.page ?? 1,
+    rowsPerPage: pagination.rowsPerPage ?? 25,
+    sortBy: (pagination.sortBy as string | null | undefined) ?? null,
+    descending: Boolean(pagination.descending)
+  });
+}
+
+function requestPayloadKey(payload: FemsqTableRequest): string {
+  return JSON.stringify({
+    filter: payload.filter ?? '',
+    columnFilters: payload.columnFilters ?? {},
+    sortBy: payload.sortBy,
+    descending: payload.descending,
+    page: payload.page,
+    rowsPerPage: payload.rowsPerPage
+  });
+}
+
+let lastEmittedRequestKey = '';
+
 function emitRequest(pagination?: NonNullable<QTableProps['pagination']>): void {
-  emit('request', buildRequest(pagination));
+  const payload = buildRequest(pagination);
+  const key = requestPayloadKey(payload);
+  if (key === lastEmittedRequestKey) {
+    return;
+  }
+  lastEmittedRequestKey = key;
+  emit('request', payload);
+}
+
+/**
+ * Сбросить на первую страницу без лишнего emit, если page уже 1.
+ */
+function ensureFirstPage(): void {
+  const current = paginationModel.value;
+  if ((current.page ?? 1) === 1) {
+    return;
+  }
+  paginationModel.value = {
+    ...current,
+    page: 1
+  };
 }
 
 function resetToFirstPageAndRequest(): void {
-  const nextPagination: NonNullable<QTableProps['pagination']> = {
+  ensureFirstPage();
+  emitRequest({
     ...paginationModel.value,
     page: 1
-  };
-  paginationModel.value = nextPagination;
-  emitRequest(nextPagination);
+  });
 }
 
 function onFilterInput(value: string | number | null): void {
   const next = value == null ? '' : String(value);
   emit('update:filter', next);
-  resetToFirstPageAndRequest();
+  ensureFirstPage();
+  // Controlled filter: watch(props.filter) эмитит @request.
+  // Uncontrolled: props.filter не изменится — эмитим здесь.
+  if (props.filter === undefined) {
+    emitRequest();
+  }
 }
 
 function onColumnFilterInput(colName: string, value: string | number | null): void {
@@ -496,7 +544,12 @@ function onColumnFilterInput(colName: string, value: string | number | null): vo
     internalColumnFilters.value = next;
   }
   emit('update:columnFilters', next);
-  resetToFirstPageAndRequest();
+  ensureFirstPage();
+  // Controlled columnFilters: watch(props.columnFilters) эмитит @request.
+  // Uncontrolled: эмитим здесь после internal update.
+  if (props.columnFilters === undefined) {
+    emitRequest();
+  }
 }
 
 function onQuasarRequest(payload: {
@@ -504,8 +557,12 @@ function onQuasarRequest(payload: {
   filter?: string;
   getCellValue: (col: QTableColumn, row: unknown) => unknown;
 }): void {
-  paginationModel.value = payload.pagination;
-  emitRequest(payload.pagination);
+  const next = payload.pagination;
+  const current = paginationModel.value;
+  if (paginationRequestKey(current) !== paginationRequestKey(next)) {
+    paginationModel.value = next;
+  }
+  emitRequest(next);
 }
 
 function onRowClick(evt: Event, row: Row, index: number): void {
