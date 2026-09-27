@@ -26,6 +26,9 @@ export interface ChartPoint {
   y: number;
 }
 
+/** Ступенчатая линия / область (ECharts `step`). */
+export type ChartLineStep = 'start' | 'middle' | 'end';
+
 export interface ChartSeriesSpec {
   id: string;
   name: string;
@@ -45,6 +48,49 @@ export interface ChartSeriesSpec {
    * 90 — снизу вверх.
    */
   pointLabelRotate?: number;
+  /**
+   * Заливка под линией (ECharts `areaStyle`). Только для `type: 'line'`.
+   * Отдельный `kind: 'area'` не вводится.
+   */
+  area?: boolean;
+  /** Прозрачность заливки; при маппинге по умолчанию 0.45. */
+  areaOpacity?: number;
+  /** Имя стопки ECharts (`stack`) — stacked area / stacked line. */
+  stack?: string;
+  /** Ступенчатая линия/область (`step`). */
+  step?: ChartLineStep;
+}
+
+/**
+ * Подмножество опции line-серии ECharts, куда мапятся area/stack/step.
+ * Поля широкие, чтобы принимать `LineSeriesOption` без кастов.
+ */
+export interface LineSeriesAreaOptions {
+  areaStyle?: unknown;
+  stack?: string;
+  step?: ChartLineStep | boolean;
+}
+
+/**
+ * Маппит `area` / `areaOpacity` / `stack` / `step` из ChartSeriesSpec в опции line-серии.
+ * Чистая функция для unit-тестов без монтирования Vue.
+ *
+ * @param line мутабельный объект опций line-серии
+ * @param ser спецификация серии (достаточно полей area/stack/step)
+ */
+export function applyLineSeriesOptions(
+  line: LineSeriesAreaOptions,
+  ser: Pick<ChartSeriesSpec, 'area' | 'areaOpacity' | 'stack' | 'step'>
+): void {
+  if (ser.area) {
+    line.areaStyle = { opacity: ser.areaOpacity ?? 0.45 };
+  }
+  if (ser.stack != null && ser.stack !== '') {
+    line.stack = ser.stack;
+  }
+  if (ser.step) {
+    line.step = ser.step;
+  }
 }
 
 export interface ChartMarkerSpec {

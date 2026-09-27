@@ -553,6 +553,8 @@ export interface ChartPoint {
   y: number;
 }
 
+export type ChartLineStep = 'start' | 'middle' | 'end';
+
 export interface ChartSeriesSpec {
   id: string;
   name: string;
@@ -563,7 +565,26 @@ export interface ChartSeriesSpec {
   showLine?: boolean;
   pointLabel?: string;
   pointLabelRotate?: number;
+  /** Заливка под линией (ECharts areaStyle). Только для line. */
+  area?: boolean;
+  /** Прозрачность заливки; при маппинге по умолчанию 0.45. */
+  areaOpacity?: number;
+  /** Имя стопки ECharts (stack). */
+  stack?: string;
+  /** Ступенчатая линия/область (step). */
+  step?: ChartLineStep;
 }
+
+export interface LineSeriesAreaOptions {
+  areaStyle?: unknown;
+  stack?: string;
+  step?: ChartLineStep | boolean;
+}
+
+export declare function applyLineSeriesOptions(
+  line: LineSeriesAreaOptions,
+  ser: Pick<ChartSeriesSpec, 'area' | 'areaOpacity' | 'stack' | 'step'>
+): void;
 
 export interface ChartMarkerSpec {
   type: 'horizontal' | 'point';

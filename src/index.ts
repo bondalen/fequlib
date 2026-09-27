@@ -20,6 +20,7 @@ export {
 export { formatMoney, formatMoneyOrDash, type FormatMoneyOptions } from './format/format-money';
 export { default as FemsqChart } from './components/chart/FemsqChart.vue';
 export {
+  applyLineSeriesOptions,
   buildTimeSeriesChartSpec,
   buildSlotDynamicsChartSpec,
   formatChartMoney,
@@ -29,7 +30,9 @@ export {
   type ChartSpec,
   type ChartSeriesSpec,
   type ChartMarkerSpec,
-  type ChartPoint
+  type ChartPoint,
+  type ChartLineStep,
+  type LineSeriesAreaOptions
 } from './components/chart/femsq-chart';
 export { default as FemsqTree } from './components/tree/FemsqTree.vue';
 export {

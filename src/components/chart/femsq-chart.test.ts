@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  applyLineSeriesOptions,
   buildSlotDynamicsChartSpec,
   buildTimeSeriesChartSpec,
   CHART_EXCEL_SERIES_COLOR,
   formatChartMoney,
+  type ChartSeriesSpec,
+  type ChartSpec,
   zoomInWindow,
   zoomOutWindow
 } from './femsq-chart';
@@ -41,6 +44,64 @@ describe('femsq-chart', () => {
     expect(spec.series[1].pointLabel).toMatch(/Excel/);
     expect(spec.series[1].points).toEqual([{ x: '2025-12-31', y: 200.23 }]);
     expect(spec.markers).toBeUndefined();
+  });
+
+  it('ChartSeriesSpec accepts area/stack/step without breaking dynamics series', () => {
+    const stacked: ChartSeriesSpec = {
+      id: 'slot-1-overd',
+      name: '#0 проср.',
+      area: true,
+      areaOpacity: 0.55,
+      stack: 'slot-1',
+      step: 'end',
+      color: '#d19a66',
+      points: [{ x: '2025-07-18', y: 100 }]
+    };
+    const dynamics: ChartSeriesSpec = {
+      id: 'slot',
+      name: 'ciaName=1',
+      points: [{ x: '2025-07-18', y: 10 }]
+    };
+    const spec: ChartSpec = {
+      kind: 'line',
+      x: { type: 'time' },
+      y: { format: 'money' },
+      series: [stacked, dynamics]
+    };
+    expect(spec.series[0].area).toBe(true);
+    expect(spec.series[0].stack).toBe('slot-1');
+    expect(spec.series[0].step).toBe('end');
+    expect(spec.series[1].area).toBeUndefined();
+  });
+
+  it('applyLineSeriesOptions sets areaStyle/stack/step with default opacity', () => {
+    const line: Parameters<typeof applyLineSeriesOptions>[0] = {};
+    applyLineSeriesOptions(line, {
+      area: true,
+      stack: 'slot-1',
+      step: 'end'
+    });
+    expect(line.areaStyle).toEqual({ opacity: 0.45 });
+    expect(line.stack).toBe('slot-1');
+    expect(line.step).toBe('end');
+  });
+
+  it('applyLineSeriesOptions uses areaOpacity and skips when area false', () => {
+    const withOpacity: Parameters<typeof applyLineSeriesOptions>[0] = {};
+    applyLineSeriesOptions(withOpacity, {
+      area: true,
+      areaOpacity: 0.55,
+      stack: 'a',
+      step: 'middle'
+    });
+    expect(withOpacity.areaStyle).toEqual({ opacity: 0.55 });
+    expect(withOpacity.step).toBe('middle');
+
+    const plain: Parameters<typeof applyLineSeriesOptions>[0] = {};
+    applyLineSeriesOptions(plain, { area: false });
+    expect(plain.areaStyle).toBeUndefined();
+    expect(plain.stack).toBeUndefined();
+    expect(plain.step).toBeUndefined();
   });
 
   it('zoomInWindow keeps right edge', () => {

@@ -77,6 +77,7 @@ import type {
 
 import {
   type ChartSpec,
+  applyLineSeriesOptions,
   formatChartMoney,
   zoomInWindow,
   zoomOutWindow
@@ -222,6 +223,7 @@ const chartOption = computed((): EChartsOption => {
       if (!showLine) {
         line.lineStyle = { width: 0, opacity: 0 };
       }
+      applyLineSeriesOptions(line, ser);
     }
     if (ser.pointLabel) {
       option.label = {
