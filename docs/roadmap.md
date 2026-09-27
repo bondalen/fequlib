@@ -15,6 +15,7 @@
 - [x] **`FemsqChart` v1:** ECharts 5 + `ChartSpec` + `fill`; FEMSQ KSDD «Динамика» (2026-08-28)
 - [x] **`formatMoney` + `valueKind: 'money'`:** `moneyColumn`, ru-RU суммы в FemsqTable; FEMSQ KSDD/КСДСФ (2026-08-29, v0.1.2)
 - [x] **`FemsqTreeList` v1 (lib):** колоночное дерево + `view: list` у обходчика (2026-09-26; задача **0018**; хост — следующий шаг)
+- [x] **`FemsqTable` 0011:** sticky header + 2-row header grid + `filtersVisible` (v0.1.11, `62a156d`/`283bce6`); contrast шапки без `--q-dark-page` (v0.1.12, `c9d80bf`/`154ef43`); chrome bar `title`/`caption`/`#actions` (v0.1.13, `aa84ab4`/`21ec7eb`)
 
 ## Backlog (задачи в registry)
 
@@ -23,7 +24,7 @@
 | 0003 | Generic `rows`/`columns` (убрать `as unknown as Record…`) | ~~medium~~ **done** |
 | 0004 | Unit-тесты: cellText / filter / sort | ~~medium~~ **done** |
 | 0005 | Фаза B: поколоночные фильтры | ~~medium~~ **done** |
-| **0011** | **Visual + sticky: DX-эталоны, `--fequlib-table-*`, sticky header + header grid + `filtersVisible`** | ~~high~~ **done** (v0.1.11; токены плотности DX — уточнять по мере UAT) |
+| **0011** | **Visual + sticky: DX-эталоны, `--fequlib-table-*`, sticky header + header grid + `filtersVisible` + chrome bar** | ~~high~~ **done** (v0.1.11–0.1.13 / `21ec7eb`; DX density UAT — хвост) |
 | **0012** | **Wide-scroll / host viewport contract** (containment, overflow); **срез fill** (2026-08-24): prop `fill` на Table+Tree | **high** |
 | **0013** | Multiline / wrap заголовков (2–3 строки, clamp) | medium |
 | **0014** | `@cell-click` API `(row, column, value/text)` | medium |
@@ -47,7 +48,7 @@ Gaps SUDZ / wide preview: [chat-plan-26-0808-sudz-gaps.md](./development/notes/c
 
 ## Рекомендации (очередь)
 
-1. **0011 + 0012** вместе (sticky бесполезен без viewport containment в flex-хосте). Срез **`fill`** (Table+Tree) — уже в коде; остаток **0012** — H-scroll / wide Rslt.  
+1. **0012** — остаток H-scroll / wide Rslt (срез **`fill`** уже в коде; sticky **0011** закрыт в v0.1.11–0.1.13).  
 2. **0013**, **0014** — для возврата Rslt preview на FemsqTable.  
 3. **0015** — обязательный ping FEMSQ с версией/коммитом fequlib.  
 4. Инфра registry: при сбое CLI — WG, потом `docker start fedoc-postgres-age`; не локальный `:5433`.

@@ -21,7 +21,7 @@
 | Глобальный фильтр | `v-model:filter` / `showFilter` (capability) — подстрока по всем `filterable`-колонкам |
 | Поколоночные фильтры (B) | Capability `showColumnFilters`; поля в шапке у `filterable !== false`; `v-model:columnFilters`; AND с глобальным |
 | **`filtersVisible`** (**0011**) | `v-model:filtersVisible`, **default `false`**: одна кнопка chrome показывает/скрывает глобальный + column filters; значения не сбрасываются |
-| **Chrome bar** (**1.7.5**) | Одна строка: `title` / `#title` \| `caption` / `#caption` \| lib (фильтр, счётчик) \| `#actions` (и alias `#toolbar-extra`) |
+| **Chrome bar** (**0.1.13**) | Одна строка: `title` / `#title` \| `caption` / `#caption` \| lib (фильтр, счётчик) \| `#actions` (и alias `#toolbar-extra`) |
 | Header grid (**0011**) | Строка 1: label + постоянный sort-slot (стрелка; резерв под индекс multi-sort); строка 2: filter full-width при раскрытии |
 | Sticky header (**0011**) | При `fill`: `thead th` sticky внутри `.q-table__middle`; токены `--fequlib-table-header-*` |
 | `fill` (срез **0012**) | Опционально: заполнить высоту родителя, скролл тела в `.q-table__middle`; default `false` |
@@ -66,12 +66,46 @@ const columns: FemsqTableColumn<MyRow>[] = [
 - Кастомный `#header-cell-*` у родителя перекрывает встроенный UI шапки для этой колонки.
 - UI полей по умолчанию **скрыт** (`filtersVisible=false`). Кнопка `data-test="femsq-table-filters-toggle"` в chrome; при `showFilter \|\| showColumnFilters`. Экраны server-поиска: `:filters-visible="true"`.
 
+### Chrome bar (`title` / `caption` / `#actions`, v0.1.13)
+
+Одна строка над таблицей (не отдельный toolbar Quasar):
+
+```vue
+<FemsqTable
+  fill
+  title="Канон долга"
+  caption="Путь / контекст"
+  v-model:filters-visible="filtersOpen"
+  :rows="rows"
+  :columns="columns"
+>
+  <template #actions>
+    <QBtn flat dense no-caps label="Сброс" @click="resetFilters" />
+  </template>
+</FemsqTable>
+```
+
+Слоты `#title` / `#caption` перекрывают props. `#toolbar-extra` — alias `#actions`.
+
+### Токены шапки (хост)
+
+Хост задаёт на теме (не `--q-dark-page`):
+
+```css
+html[data-femsq-theme] {
+  --fequlib-table-header-bg: …;
+  --fequlib-table-header-color: …;
+}
+```
+
+Fallback в lib: `var(--femsq-bg-elevated, #ffffff)` / `var(--femsq-text, inherit)` (v0.1.12).
+
 ### Fill-layout (`fill`, срез **0012**)
 
 Опциональный boolean, **default `false`** (additive-first). Когда `true`:
 
 1. Корень `.femsq-table--fill`: `height: 100%`, `min-width: 0`, `overflow: hidden`.
-2. `QTable` занимает оставшуюся высоту под toolbar фильтра; скроллится **`.q-table__middle`** (шапка таблицы остаётся над телом — поведение Quasar card + bounded height).
+2. `QTable` занимает оставшуюся высоту под chrome; скроллится **`.q-table__middle`**. При `fill` шапка **sticky** (**0011**, v0.1.11); `border-collapse: separate`.
 3. Без `fill` — размер по контенту (master-списки без сплиттера не схлопываются).
 
 Хост:
@@ -84,17 +118,17 @@ const columns: FemsqTableColumn<MyRow>[] = [
 
 - `class="fit"` попадает на `QTable` (attrs) и помогает дотянуть карточку; **обязателен prop `fill`** на корне FemsqTable — одного `fit` недостаточно.
 - Не ставить вторую обёртку с `overflow: auto` вокруг таблицы при `fill` (двойной скролл).
-- Это **срез** задачи **0012** (viewport в flex/splitter), не полный wide Excel Rslt preview и не sticky/DX (**0011**).
+- Это **срез** задачи **0012** (viewport в flex/splitter), не полный wide Excel Rslt preview. Sticky/header chrome — **0011** (закрыт в v0.1.11–0.1.13).
 
 ## Дизайн: что в lib, что в хосте
 
 | В fequlib | В приложении-потребителе |
 |-----------|-------------------------|
 | Контракт filter/sort/columnFilters | Тема (light/dark), цвета, шрифты |
-| Метрики `--fequlib-table-*` + sticky header/filter-row — задача **0011** | Переопределение тех же токенов под продукт |
+| Sticky + header grid + `filtersVisible` + chrome bar (**0011**, v0.1.11–0.1.13) | `--fequlib-table-header-bg` / `--fequlib-table-header-color`; прочие `--fequlib-table-*` плотности — UAT |
 | Viewport containment / wide scroll — **0012** | Flex-хост: `min-width: 0`, высота рамки |
 | **`fill`** (срез **0012**, 2026-08-24) | Родитель с ограниченной высотой (flex/splitter/`height:100%` + `overflow:hidden`); **не** дублировать `overflow:auto` на обёртке |
-| Multiline header / `@cell-click` — **0013**, **0014** | Chrome (TopBar/StatusBar), Quasar brand |
+| Multiline header / `@cell-click` — **0013**, **0014** | Chrome оболочки (TopBar/StatusBar), Quasar brand |
 
 Не хардкодить бренд-цвета в lib. Эталоны DX: `docs/assets/devexpress-grid/`.
 
@@ -127,7 +161,7 @@ const columns: FemsqTableColumn<MyRow>[] = [
 | 2 | **Sticky header** (+ filter row внутри той же `th`) внутри viewport | ✅ при `fill` (v0.1.11): sticky `thead th`; filter в той же ячейке | Длинный список строк | **0011** |
 | 3 | **Multiline / wrap заголовков** (2–3 строки, clamp) | `.femsq-table__header-label { white-space: nowrap }` | Длинные подписи Excel (`2026. II-й квартал…`) | **0013** |
 | 4 | **`@cell-click`** (или эквивалент) с `(row, column, value/text)` | Только `@row-click`; ячейка — через `#body-cell-*` + свой click | Нижняя detail-панель текста ячейки | **0014** |
-| 5 | Согласованность **sticky + границы колонок** (избегать sticky + `border-collapse: collapse`) | Уточнить при реализации на QTable/обёртке | th/td не разъезжаются при H-scroll | **0011** |
+| 5 | Согласованность **sticky + границы колонок** (избегать sticky + `border-collapse: collapse`) | ✅ при `fill`: `border-collapse: separate` (v0.1.11) | th/td не разъезжаются при H-scroll | **0011** |
 
 Опционально (ниже приоритетом, не блокер MVP): band/`headerClasses` для групп колонок; freeze левых колонок.
 

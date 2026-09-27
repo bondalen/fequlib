@@ -1,7 +1,7 @@
 # FemsqTable — целевой визуал и распределение дизайна
 
-**Дата:** 2026-07-29 · **обновлено:** 2026-08-08  
-**Статус:** принято (бриф); реализация токенов/скина/sticky — задачи **0011+**  
+**Дата:** 2026-07-29 · **обновлено:** 2026-09-27  
+**Статус:** бриф принят; sticky / `filtersVisible` / header grid ✅ **v0.1.11**; contrast шапки ✅ **v0.1.12**; chrome bar ✅ **v0.1.13**. DX-скрины оператора и тонкая плотность строк — хвост UAT.  
 **Компонент:** [FemsqTable.md](../components/FemsqTable.md)  
 **Эталоны DX:** [assets/devexpress-grid/](../assets/devexpress-grid/)
 
@@ -12,7 +12,7 @@
 | **Тема продукта** | Приложение-потребитель (FEMSQ) | светлая/тёмная, палитра, шрифты, радиусы chrome, focus, TopBar/StatusBar |
 | **Примитивы Quasar** | Хост + Quasar | `$primary`, dark mode, типографика — то, что уже видит `QTable`/`QInput` |
 | **Контракт грида** | fequlib | filter, sort, columnFilters, slots, `mode`/`@request`, additive API |
-| **Хроматика грида** | fequlib | плотность, высоты строки/шапки/filter-row, padding ячеек, раскладка filter under header, **sticky header + sticky filter-row** |
+| **Хроматика грида** | fequlib | плотность, высоты строки/шапки/filter-row, padding ячеек, раскладка filter under header, **sticky header** (filter в той же `th`) |
 | **Viewport / wide scroll** | fequlib + хост | задача **0012**; срез **`fill`** (2026-08-24): fill parent + V-scroll в splitter; H-scroll / wide Rslt — ещё открыто; sticky работает *внутри* этой рамки |
 | **Исключение экрана** | форма в хосте | редко: локальный `dense`/слот; не норма |
 
@@ -21,36 +21,39 @@
 ## Что библиотека НЕ делает
 
 - Не задаёт отдельную тему «fequlib Kimbie / VS».
-- Не хардкодит `#hex` цветов текста/фона/selection под бренд FEMSQ.
+- Не хардкодит `#hex` цветов текста/фона/selection под бренд FEMSQ (кроме нейтрального fallback `#ffffff` у шапки, если хост не задал токены).
 - Не копирует WinForms/WPF chrome DevExpress пиксель-в-пиксель.
 
 Цвета: `inherit` / Quasar / `var(--femsq-…, fallback на Quasar/нейтраль)`.
 
-## Токены хроматики (целевой контракт, к внедрению)
+## Токены хроматики
 
-Имена стабилизировать в коде additive-first; хост переопределяет в своей теме:
+Имена стабилизировать additive-first; хост переопределяет в своей теме.
 
-| Токен | Смысл |
-|-------|--------|
-| `--fequlib-table-row-height` | высота строки данных |
-| `--fequlib-table-header-height` | шапка |
-| `--fequlib-table-filter-row-height` | ряд поколоночных фильтров |
-| `--fequlib-table-cell-padding-x` / `-y` | плотность ячеек |
-| `--fequlib-table-header-font-weight` | акцент шапки (не цвет) |
-| `--fequlib-table-header-label-lines` (или prop) | multiline wrap заголовков, clamp 2–3 — задача **0013** |
+| Токен | Смысл | Статус |
+|-------|--------|--------|
+| `--fequlib-table-header-bg` / `--fequlib-table-header-color` | фон и текст sticky-шапки | ✅ v0.1.12 (хост; **не** `--q-dark-page`) |
+| `--fequlib-table-header-h` | высота строки label в header grid | ✅ default в lib |
+| `--fequlib-table-row-height` | высота строки данных | хвост UAT / DX density |
+| `--fequlib-table-header-height` | общая высота шапки | хвост UAT |
+| `--fequlib-table-filter-row-height` | ряд поколоночных фильтров | хвост UAT |
+| `--fequlib-table-cell-padding-x` / `-y` | плотность ячеек | хвост UAT |
+| `--fequlib-table-header-font-weight` | акцент шапки (не цвет) | хвост UAT |
+| `--fequlib-table-header-label-lines` (или prop) | multiline wrap заголовков, clamp 2–3 | задача **0013** |
 
 Опционально selection/border — только через `var(--q-…)` или полупрозрачный primary хоста, не собственная палитра lib.
 
-### Sticky — обязательный deliverable 0011 (не только токены высоты)
+### Sticky / header — deliverable 0011 ✅
 
-В брифe sticky header заявлен с 2026-07-29; по обратной связи FEMSQ СУДЗ (2026-08-08) это **не опция документации**, а часть закрытия **0011**:
-
-- [x] `position: sticky` для строки заголовков внутри scroll-viewport (v0.1.11, при `fill`)
-- [x] filter-row в той же `th` (раскрывается с `filtersVisible`) — отдельный sticky-tr не нужен
-- [x] без раздувания родителей: sticky + **0012** `fill` (viewport containment)
+- [x] `position: sticky` для `thead th` внутри scroll-viewport при `fill` (v0.1.11)
+- [x] filter-row в той же `th` (раскрывается с `filtersVisible`, default false) — отдельный sticky-tr не нужен
+- [x] 2-row header grid: label+sort-slot / column filter
+- [x] без раздувания родителей: sticky + **0012** `fill`
 - [x] `border-collapse: separate` при fill — th/td не разъезжаются при scroll
+- [x] contrast: фон/цвет из `--fequlib-table-header-*` / `--femsq-*` / `#ffffff` (v0.1.12)
+- [x] chrome bar: `title`/`caption` + `#title`/`#caption`/`#actions` (v0.1.13)
 
-До закрытия 0011–0014 предпросмотр Rslt в FEMSQ остаётся на native grid; см. [chat-plan-26-0808-sudz-gaps.md](../development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md).
+До закрытия **0012–0014** предпросмотр Rslt в FEMSQ остаётся на native grid; см. [chat-plan-26-0808-sudz-gaps.md](../development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md).
 
 ## DevExpress как эталон
 
@@ -69,12 +72,12 @@
 |-------------|---------------------|----------------|
 | высоты, padding, filter under header, плотность | тема, цвета, шрифты, chrome | WinForms chrome, чужие системные шрифты, чужая палитра dark/light |
 
-UAT разделять: **поведение** (filter/sort) vs **плотность/раскладка** vs **тема оболочки** (не винить грид за цвет StatusBar).
+UAT разделять: **поведение** (filter/sort) vs **плотность/раскладка** vs **тема оболочки** (не винить грид за цвет StatusBar). Открыто: скрины DX оператора и тонкая настройка плотности строк (не блокер sticky).
 
 ## FEMSQ как первый хост
 
 - Тема и `--femsq-*`: `docs/development/frontend-themes.md`, `femsq-theme-tokens.css`.
-- Переопределение `--fequlib-table-*` — один блок в теме хоста после появления токенов в lib.
+- Хост задаёт `--fequlib-table-header-bg` / `--fequlib-table-header-color` (и при необходимости остальные `--fequlib-table-*`) в теме после v0.1.11+.
 - Контракт потребителей: FEMSQ `docs/development/notes/UI/02-8_femsq-table-component.md`.
 
 ## Связанные планы

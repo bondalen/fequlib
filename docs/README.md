@@ -21,15 +21,16 @@
 | [chat-plan-26-0824-fill-layout.md](./development/notes/chats/chat-plan/chat-plan-26-0824-fill-layout.md) | Срез **0012**: prop `fill` Table+Tree |
 | [chat-plan-26-0828-femsq-chart.md](./development/notes/chats/chat-plan/chat-plan-26-0828-femsq-chart.md) | **`FemsqChart` v1** (задача **0017**) |
 | [chat-resume-26-0809-sudz-gaps-registry-vps.md](./development/notes/chats/chat-resume/chat-resume-26-0809-sudz-gaps-registry-vps.md) | Резюме чата 2026-08-08…09 |
+| [chat-resume-26-0927-femsq-table-0011-docs-sync.md](./development/notes/chats/chat-resume/chat-resume-26-0927-femsq-table-0011-docs-sync.md) | Docs sync 0011 / FemsqTable 0.1.11–0.1.13 |
 
 ## Итоги
 
-- **FemsqTable:** фазы A–B ок для списков FEMSQ; для СУДЗ Rslt preview зафиксированы gaps → задачи registry **0011–0015** (код грида — отдельно).
+- **FemsqTable:** фазы A–B ок для списков FEMSQ. Задача **0011** закрыта по коду (2026-09-27): sticky + header grid + `filtersVisible` (**0.1.11**), contrast шапки (**0.1.12**), chrome bar title/caption/actions (**0.1.13**, `21ec7eb`). DX-плотность / полный набор высот `--fequlib-table-*` — **хвост UAT**, не блокер sticky. Остаток wide Rslt: **0012** (H-scroll), **0013**, **0014**, затем **0015**.
 - **FemsqTree:** v1 закрыта (задача **0016**, 2026-08-18); контракт — [FemsqTree.md](./components/FemsqTree.md).
 - **FemsqTreeList:** lib v1 (задача **0018**, 2026-09-26); контракт — [FemsqTreeList.md](./components/FemsqTreeList.md). Хост FEMSQ ещё не переведён.
 - **FemsqChart:** v1 (2026-08-28); ECharts 5; контракт — [FemsqChart.md](./components/FemsqChart.md).
 - **formatMoney / valueKind:** v0.1.2 (2026-08-29); [format-money.md](./components/format-money.md).
-- **docs-registry:** канон на VPS (`10.7.0.1:5432` / DB `docs_registry` в `fedoc-postgres-age`); локальный Docker `:5433` снят; backlog fequlib **0001–0018** (**0018** `in_progress`, 2026-09-26). В реестре нет строки **0017** (`FemsqChart` отмечен только в roadmap).
+- **docs-registry:** канон на VPS (`10.7.0.1:5432` / DB `docs_registry` в `fedoc-postgres-age`); локальный Docker `:5433` снят; backlog fequlib **0001–0018** (**0011** completed, **0018** `in_progress`). В реестре нет строки **0017** (`FemsqChart` отмечен только в roadmap).
 
 ## Задачи
 
@@ -51,7 +52,7 @@ npm run cli -- task list --project fequlib
 
 ## Рекомендации далее
 
-1. Реализация **0011** (sticky + токены) и остаток **0012** (H-scroll / wide) — приоритет high; срез **`fill`** (V-scroll в splitter) уже в lib.  
+1. Остаток **0012** (H-scroll / wide Rslt) — приоритет high; срез **`fill`** (V-scroll в splitter) и sticky **0011** уже в lib.  
 2. Затем **0013** / **0014**; закрытие цепочки — **0015** (уведомить FEMSQ).  
 3. Additive-first: не ломать текущих потребителей списков.
 
