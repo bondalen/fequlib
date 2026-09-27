@@ -10,32 +10,59 @@
     ]"
   >
     <div
-      v-if="filterChromeVisible"
+      v-if="chromeVisible"
       class="femsq-table__chrome row items-center no-wrap q-gutter-xs q-mb-xs"
+      data-test="femsq-table-chrome"
     >
-      <QBtn
-        flat
-        dense
-        round
-        size="sm"
-        :icon="filtersVisibleModel ? 'filter_alt' : 'filter_list'"
-        :color="filtersToggleColor"
-        :aria-pressed="filtersVisibleModel ? 'true' : 'false'"
-        aria-label="Показать или скрыть фильтры"
-        data-test="femsq-table-filters-toggle"
-        @click="toggleFiltersVisible"
-      />
-      <span
-        v-if="hasActiveFilters"
-        class="femsq-table__filters-active text-caption"
-        data-test="femsq-table-filters-active"
-        title="Есть активные фильтры"
-      >●</span>
-      <div v-if="showFilterCount" class="col-auto text-caption femsq-text-muted">
-        {{ visibleCount }} из {{ totalCount }}
+      <div
+        v-if="titleSlotOrText"
+        class="femsq-table__chrome-title ellipsis"
+        data-test="femsq-table-chrome-title"
+      >
+        <slot name="title">{{ title }}</slot>
       </div>
-      <div class="col" />
-      <slot name="toolbar-extra" />
+      <div
+        v-if="captionSlotOrText"
+        class="femsq-table__chrome-caption col ellipsis text-caption"
+        data-test="femsq-table-chrome-caption"
+        :title="captionTitleAttr"
+      >
+        <slot name="caption">{{ caption }}</slot>
+      </div>
+      <div v-else class="col" />
+      <div class="femsq-table__chrome-commands row items-center no-wrap q-gutter-xs shrink-0">
+        <template v-if="filterCapability">
+          <QBtn
+            flat
+            dense
+            round
+            size="sm"
+            :icon="filtersVisibleModel ? 'filter_alt' : 'filter_list'"
+            :color="filtersToggleColor"
+            :aria-pressed="filtersVisibleModel ? 'true' : 'false'"
+            aria-label="Показать или скрыть фильтры"
+            data-test="femsq-table-filters-toggle"
+            @click="toggleFiltersVisible"
+          />
+          <span
+            v-if="hasActiveFilters"
+            class="femsq-table__filters-active text-caption"
+            data-test="femsq-table-filters-active"
+            title="Есть активные фильтры"
+          >●</span>
+          <div v-if="showFilterCount" class="col-auto text-caption femsq-text-muted">
+            {{ visibleCount }} из {{ totalCount }}
+          </div>
+        </template>
+        <div
+          v-if="actionsSlotPresent"
+          class="femsq-table__chrome-actions row items-center no-wrap q-gutter-xs"
+          data-test="femsq-table-chrome-actions"
+        >
+          <slot name="actions" />
+          <slot name="toolbar-extra" />
+        </div>
+      </div>
     </div>
 
     <div
@@ -157,6 +184,10 @@ const props = withDefaults(
      * Ключ — `column.name`; значение — подстрока (case-insensitive).
      */
     columnFilters?: Record<string, string>;
+    /** Заголовок в однострочной панели chrome (сегмент title). */
+    title?: string;
+    /** Подпись / путь справа от title (сегмент caption, ellipsis). */
+    caption?: string;
     /**
      * Показаны ли UI-поля фильтров (глобальный + поколоночные).
      * Capability задают showFilter / showColumnFilters. Default false.
@@ -192,6 +223,8 @@ const props = withDefaults(
     mode: 'client',
     filter: '',
     columnFilters: undefined,
+    title: '',
+    caption: '',
     filtersVisible: undefined,
     showFilter: true,
     showColumnFilters: true,
@@ -240,7 +273,32 @@ const filtersVisibleModel = computed({
 
 const filterCapability = computed(() => props.showFilter || props.showColumnFilters);
 
-const filterChromeVisible = computed(() => filterCapability.value);
+const titleSlotOrText = computed(
+  () => Boolean(slots.title) || Boolean((props.title ?? '').trim())
+);
+
+const captionSlotOrText = computed(
+  () => Boolean(slots.caption) || Boolean((props.caption ?? '').trim())
+);
+
+const actionsSlotPresent = computed(() => Boolean(slots.actions) || Boolean(slots['toolbar-extra']));
+
+/** Панель chrome: title/caption/actions или filter-capability. */
+const chromeVisible = computed(
+  () =>
+    titleSlotOrText.value ||
+    captionSlotOrText.value ||
+    actionsSlotPresent.value ||
+    filterCapability.value
+);
+
+const captionTitleAttr = computed(() => {
+  if (slots.caption) {
+    return undefined;
+  }
+  const text = (props.caption ?? '').trim();
+  return text || undefined;
+});
 
 const hasActiveFilters = computed(() => {
   if ((filterModel.value ?? '').trim() !== '') {
@@ -294,7 +352,7 @@ const forwardedSlots = computed(() => {
   const result: Record<string, unknown> = {};
   const reserved = new Set(autoHeaderColumns.value.map((name) => `header-cell-${name}`));
   for (const name of Object.keys(slots)) {
-    if (name === 'toolbar-extra') {
+    if (name === 'toolbar-extra' || name === 'actions' || name === 'title' || name === 'caption') {
       continue;
     }
     if (reserved.has(name)) {
@@ -534,6 +592,27 @@ defineExpose({
 
 .femsq-table__chrome {
   min-height: 28px;
+  gap: 4px;
+}
+
+.femsq-table__chrome-title {
+  flex: 0 1 auto;
+  max-width: 40%;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.femsq-table__chrome-caption {
+  flex: 1 1 0;
+  min-width: 0;
+  opacity: 0.85;
+  line-height: 1.3;
+}
+
+.femsq-table__chrome-commands {
+  margin-left: auto;
 }
 
 .femsq-table__filters-active {

@@ -21,6 +21,7 @@
 | Глобальный фильтр | `v-model:filter` / `showFilter` (capability) — подстрока по всем `filterable`-колонкам |
 | Поколоночные фильтры (B) | Capability `showColumnFilters`; поля в шапке у `filterable !== false`; `v-model:columnFilters`; AND с глобальным |
 | **`filtersVisible`** (**0011**) | `v-model:filtersVisible`, **default `false`**: одна кнопка chrome показывает/скрывает глобальный + column filters; значения не сбрасываются |
+| **Chrome bar** (**1.7.5**) | Одна строка: `title` / `#title` \| `caption` / `#caption` \| lib (фильтр, счётчик) \| `#actions` (и alias `#toolbar-extra`) |
 | Header grid (**0011**) | Строка 1: label + постоянный sort-slot (стрелка; резерв под индекс multi-sort); строка 2: filter full-width при раскрытии |
 | Sticky header (**0011**) | При `fill`: `thead th` sticky внутри `.q-table__middle`; токены `--fequlib-table-header-*` |
 | `fill` (срез **0012**) | Опционально: заполнить высоту родителя, скролл тела в `.q-table__middle`; default `false` |
