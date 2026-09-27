@@ -23,7 +23,7 @@
 | 0003 | Generic `rows`/`columns` (убрать `as unknown as Record…`) | ~~medium~~ **done** |
 | 0004 | Unit-тесты: cellText / filter / sort | ~~medium~~ **done** |
 | 0005 | Фаза B: поколоночные фильтры | ~~medium~~ **done** |
-| **0011** | **Visual + sticky: DX-эталоны, `--fequlib-table-*`, sticky header/filter-row** | **high** |
+| **0011** | **Visual + sticky: DX-эталоны, `--fequlib-table-*`, sticky header + header grid + `filtersVisible`** | ~~high~~ **done** (v0.1.11; токены плотности DX — уточнять по мере UAT) |
 | **0012** | **Wide-scroll / host viewport contract** (containment, overflow); **срез fill** (2026-08-24): prop `fill` на Table+Tree | **high** |
 | **0013** | Multiline / wrap заголовков (2–3 строки, clamp) | medium |
 | **0014** | `@cell-click` API `(row, column, value/text)` | medium |

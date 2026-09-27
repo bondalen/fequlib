@@ -45,10 +45,10 @@
 
 В брифe sticky header заявлен с 2026-07-29; по обратной связи FEMSQ СУДЗ (2026-08-08) это **не опция документации**, а часть закрытия **0011**:
 
-- [ ] `position: sticky` для строки заголовков внутри scroll-viewport
-- [ ] ideally то же для filter-row (под шапкой)
-- [ ] без раздувания родителей: sticky + **0012** (viewport containment)
-- [ ] согласовать границы колонок: избегать бага sticky + `border-collapse: collapse` (th/td не разъезжаются при H-scroll)
+- [x] `position: sticky` для строки заголовков внутри scroll-viewport (v0.1.11, при `fill`)
+- [x] filter-row в той же `th` (раскрывается с `filtersVisible`) — отдельный sticky-tr не нужен
+- [x] без раздувания родителей: sticky + **0012** `fill` (viewport containment)
+- [x] `border-collapse: separate` при fill — th/td не разъезжаются при scroll
 
 До закрытия 0011–0014 предпросмотр Rslt в FEMSQ остаётся на native grid; см. [chat-plan-26-0808-sudz-gaps.md](../development/notes/chats/chat-plan/chat-plan-26-0808-sudz-gaps.md).
 

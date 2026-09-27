@@ -1,6 +1,47 @@
 <template>
-  <div class="femsq-table" :class="[rootClass, { 'femsq-table--fill': fill }]">
-    <div v-if="showFilter" class="femsq-table__toolbar row q-col-gutter-sm items-center q-mb-xs">
+  <div
+    class="femsq-table"
+    :class="[
+      rootClass,
+      {
+        'femsq-table--fill': fill,
+        'femsq-table--filters-open': filtersVisibleModel
+      }
+    ]"
+  >
+    <div
+      v-if="filterChromeVisible"
+      class="femsq-table__chrome row items-center no-wrap q-gutter-xs q-mb-xs"
+    >
+      <QBtn
+        flat
+        dense
+        round
+        size="sm"
+        :icon="filtersVisibleModel ? 'filter_alt' : 'filter_list'"
+        :color="filtersToggleColor"
+        :aria-pressed="filtersVisibleModel ? 'true' : 'false'"
+        aria-label="Показать или скрыть фильтры"
+        data-test="femsq-table-filters-toggle"
+        @click="toggleFiltersVisible"
+      />
+      <span
+        v-if="hasActiveFilters"
+        class="femsq-table__filters-active text-caption"
+        data-test="femsq-table-filters-active"
+        title="Есть активные фильтры"
+      >●</span>
+      <div v-if="showFilterCount" class="col-auto text-caption femsq-text-muted">
+        {{ visibleCount }} из {{ totalCount }}
+      </div>
+      <div class="col" />
+      <slot name="toolbar-extra" />
+    </div>
+
+    <div
+      v-if="filtersVisibleModel && showFilter"
+      class="femsq-table__toolbar row q-col-gutter-sm items-center q-mb-xs"
+    >
       <div class="col-12 col-sm-grow">
         <QInput
           :model-value="filterModel"
@@ -16,10 +57,6 @@
           </template>
         </QInput>
       </div>
-      <div v-if="showFilterCount" class="col-auto text-caption femsq-text-muted self-center">
-        {{ visibleCount }} из {{ totalCount }}
-      </div>
-      <slot name="toolbar-extra" />
     </div>
 
     <QTable
@@ -34,14 +71,26 @@
       @row-click="onRowClick"
     >
       <template
-        v-for="colName in autoFilterHeaderColumns"
-        :key="`col-filter-${colName}`"
+        v-for="colName in autoHeaderColumns"
+        :key="`hdr-${colName}`"
         #[`header-cell-${colName}`]="slotProps"
       >
         <QTh :props="slotProps" class="femsq-table__th">
           <div class="femsq-table__header-cell">
-            <div class="femsq-table__header-label">{{ slotProps.col.label }}</div>
+            <div class="femsq-table__header-row1">
+              <div class="femsq-table__header-label">{{ slotProps.col.label }}</div>
+              <div class="femsq-table__sort-slot" aria-hidden="true">
+                <span class="femsq-table__sort-index" />
+                <QIcon
+                  v-if="isColumnSorted(colName)"
+                  class="femsq-table__sort-arrow"
+                  size="xs"
+                  :name="paginationModel.descending ? 'arrow_downward' : 'arrow_upward'"
+                />
+              </div>
+            </div>
             <QInput
+              v-if="columnFilterUiVisible(colName)"
               dense
               borderless
               clearable
@@ -71,9 +120,10 @@
  * Фаза A: client-mode + server/@request.
  * Фаза B: поколоночные текстовые фильтры (AND с глобальным).
  * Generic Row: DTO-интерфейсы без index signature принимаются без кастов.
+ * 0011: sticky header (fill), 2-row header grid, filtersVisible toggle.
  */
 import { computed, onMounted, ref, useAttrs, useSlots, watch } from 'vue';
-import { QIcon, QInput, QTable, QTh, type QTableColumn, type QTableProps } from 'quasar';
+import { QBtn, QIcon, QInput, QTable, QTh, type QTableColumn, type QTableProps } from 'quasar';
 
 import { formatMoney } from '../../format/format-money';
 import {
@@ -107,9 +157,14 @@ const props = withDefaults(
      * Ключ — `column.name`; значение — подстрока (case-insensitive).
      */
     columnFilters?: Record<string, string>;
-    /** Показывать строку глобального фильтра над таблицей. */
+    /**
+     * Показаны ли UI-поля фильтров (глобальный + поколоночные).
+     * Capability задают showFilter / showColumnFilters. Default false.
+     */
+    filtersVisible?: boolean;
+    /** Capability: глобальный фильтр над таблицей. */
     showFilter?: boolean;
-    /** Показывать поля фильтра под заголовками filterable-колонок. */
+    /** Capability: поколоночные фильтры в шапке. */
     showColumnFilters?: boolean;
     /** Placeholder для поколоночных полей. */
     columnFilterPlaceholder?: string;
@@ -127,6 +182,7 @@ const props = withDefaults(
      * Fill-layout: заполнить высоту родителя и скроллить тело грида
      * (`.q-table__middle`). Default false — размер по контенту (additive-first).
      * Хост: ограничить родителя (flex/`height:100%`/`overflow:hidden`); не дублировать overflow-обёртку.
+     * При fill шапка thead sticky внутри viewport.
      */
     fill?: boolean;
     /** Пагинация QTable (v-model:pagination). */
@@ -136,6 +192,7 @@ const props = withDefaults(
     mode: 'client',
     filter: '',
     columnFilters: undefined,
+    filtersVisible: undefined,
     showFilter: true,
     showColumnFilters: true,
     columnFilterPlaceholder: 'Фильтр',
@@ -152,6 +209,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   'update:filter': [value: string];
   'update:columnFilters': [value: Record<string, string>];
+  'update:filtersVisible': [value: boolean];
   'update:pagination': [value: NonNullable<QTableProps['pagination']>];
   /** Контракт запроса (server-режим; в client эмитится для единообразия). */
   request: [payload: FemsqTableRequest];
@@ -168,6 +226,32 @@ const filterModel = computed(() => props.filter ?? '');
 const internalColumnFilters = ref<Record<string, string>>({});
 
 const columnFiltersModel = computed(() => props.columnFilters ?? internalColumnFilters.value);
+
+/** Внутреннее filtersVisible, если родитель не передаёт v-model. */
+const internalFiltersVisible = ref(false);
+
+const filtersVisibleModel = computed({
+  get: () => (props.filtersVisible !== undefined ? props.filtersVisible : internalFiltersVisible.value),
+  set: (value: boolean) => {
+    internalFiltersVisible.value = value;
+    emit('update:filtersVisible', value);
+  }
+});
+
+const filterCapability = computed(() => props.showFilter || props.showColumnFilters);
+
+const filterChromeVisible = computed(() => filterCapability.value);
+
+const hasActiveFilters = computed(() => {
+  if ((filterModel.value ?? '').trim() !== '') {
+    return true;
+  }
+  return Object.values(columnFiltersModel.value).some((v) => (v ?? '').trim() !== '');
+});
+
+const filtersToggleColor = computed(() =>
+  filtersVisibleModel.value || hasActiveFilters.value ? 'primary' : undefined
+);
 
 const internalPagination = ref<NonNullable<QTableProps['pagination']>>({
   page: 1,
@@ -200,24 +284,15 @@ const tableAttrs = computed(() => {
 });
 
 /**
- * Колонки, для которых рисуем header-фильтр сами
- * (filterable !== false и родитель не переопределил #header-cell-*).
+ * Колонки с авто-шапкой (label + sort-slot [+ filter]), если нет #header-cell-*.
  */
-const autoFilterHeaderColumns = computed(() => {
-  if (!props.showColumnFilters) {
-    return [] as string[];
-  }
-  return props.columns
-    .filter((col) => col.filterable !== false)
-    .filter((col) => !slots[`header-cell-${col.name}`])
-    .map((col) => col.name);
-});
+const autoHeaderColumns = computed(() =>
+  props.columns.filter((col) => !slots[`header-cell-${col.name}`]).map((col) => col.name)
+);
 
 const forwardedSlots = computed(() => {
   const result: Record<string, unknown> = {};
-  const reserved = new Set(
-    autoFilterHeaderColumns.value.map((name) => `header-cell-${name}`)
-  );
+  const reserved = new Set(autoHeaderColumns.value.map((name) => `header-cell-${name}`));
   for (const name of Object.keys(slots)) {
     if (name === 'toolbar-extra') {
       continue;
@@ -264,8 +339,35 @@ const displayRows = computed(() => filteredRows.value);
 const visibleCount = computed(() => filteredRows.value.length);
 const totalCount = computed(() => props.rows.length);
 
+/**
+ * Показать поколоночный фильтр для колонки.
+ *
+ * @param colName имя колонки
+ */
+function columnFilterUiVisible(colName: string): boolean {
+  if (!filtersVisibleModel.value || !props.showColumnFilters) {
+    return false;
+  }
+  const col = props.columns.find((item) => item.name === colName);
+  return col != null && col.filterable !== false;
+}
+
+/**
+ * Колонка сейчас ведущая в одноколоночной сортировке.
+ *
+ * @param colName имя колонки
+ */
+function isColumnSorted(colName: string): boolean {
+  return paginationModel.value.sortBy === colName;
+}
+
 function columnFilterValue(colName: string): string {
   return columnFiltersModel.value[colName] ?? '';
+}
+
+/** Переключить видимость фильтров. */
+function toggleFiltersVisible(): void {
+  filtersVisibleModel.value = !filtersVisibleModel.value;
 }
 
 /**
@@ -404,6 +506,11 @@ defineExpose({
 
 <style scoped>
 .femsq-table {
+  --fequlib-table-header-h: 1.75rem;
+  --fequlib-table-filter-row-h: 1.75rem;
+  --fequlib-table-sort-slot-w: 1.25rem;
+  --fequlib-table-header-bg: var(--q-dark-page, #fff);
+
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -417,8 +524,18 @@ defineExpose({
   overflow: hidden;
 }
 
+.femsq-table--fill .femsq-table__chrome,
 .femsq-table--fill .femsq-table__toolbar {
   flex: 0 0 auto;
+}
+
+.femsq-table__chrome {
+  min-height: 28px;
+}
+
+.femsq-table__filters-active {
+  color: var(--q-primary);
+  line-height: 1;
 }
 
 .femsq-table__q-table {
@@ -446,6 +563,29 @@ defineExpose({
   min-width: 0;
 }
 
+/* Sticky header inside fill viewport; separate borders avoid th/td drift */
+.femsq-table--fill :deep(table.q-table) {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.femsq-table--fill :deep(thead tr > th) {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--fequlib-table-header-bg);
+  background-clip: padding-box;
+}
+
+.femsq-table__th {
+  vertical-align: top;
+}
+
+/* Hide Quasar default sort glyph — arrow lives in sort-slot */
+.femsq-table__th :deep(.q-table__sort-icon) {
+  display: none !important;
+}
+
 .femsq-table__header-cell {
   display: flex;
   flex-direction: column;
@@ -454,13 +594,54 @@ defineExpose({
   min-width: 0;
 }
 
+.femsq-table__header-row1 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--fequlib-table-header-h);
+  min-width: 0;
+}
+
 .femsq-table__header-label {
+  flex: 1 1 auto;
+  min-width: 0;
   line-height: 1.2;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.femsq-table__sort-slot {
+  flex: 0 0 var(--fequlib-table-sort-slot-w);
+  width: var(--fequlib-table-sort-slot-w);
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  opacity: 0.85;
+}
+
+/* Reserved for future multi-sort index digit */
+.femsq-table__sort-index {
+  flex: 0 0 0.55rem;
+  width: 0.55rem;
+  min-height: 1em;
+  font-size: 0.65rem;
+  line-height: 1;
+  text-align: right;
+}
+
+.femsq-table__sort-arrow {
+  flex: 0 0 auto;
 }
 
 .femsq-table__col-filter {
-  min-width: 4.5rem;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--fequlib-table-filter-row-h);
   font-weight: normal;
 }
 

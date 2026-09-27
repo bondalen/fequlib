@@ -18,8 +18,11 @@
 | `filterValue?: (row) => string` | Для `#body-cell-*`, если колонка в поиске; иначе `filterable: false` или dev-warning |
 | `actionsColumn()` | `filterable: false`, `sortable: false` — без UI колоночного фильтра |
 | `mode: 'client' \| 'server'` | Server эмитит `@request` `{ filter, columnFilters?, sortBy, descending, page, rowsPerPage }` |
-| Глобальный фильтр | `v-model:filter` / `showFilter` — подстрока по всем `filterable`-колонкам |
-| Поколоночные фильтры (B) | Под заголовком у колонок с `filterable !== false`; `v-model:columnFilters`; AND с глобальным |
+| Глобальный фильтр | `v-model:filter` / `showFilter` (capability) — подстрока по всем `filterable`-колонкам |
+| Поколоночные фильтры (B) | Capability `showColumnFilters`; поля в шапке у `filterable !== false`; `v-model:columnFilters`; AND с глобальным |
+| **`filtersVisible`** (**0011**) | `v-model:filtersVisible`, **default `false`**: одна кнопка chrome показывает/скрывает глобальный + column filters; значения не сбрасываются |
+| Header grid (**0011**) | Строка 1: label + постоянный sort-slot (стрелка; резерв под индекс multi-sort); строка 2: filter full-width при раскрытии |
+| Sticky header (**0011**) | При `fill`: `thead th` sticky внутри `.q-table__middle`; токены `--fequlib-table-header-*` |
 | `fill` (срез **0012**) | Опционально: заполнить высоту родителя, скролл тела в `.q-table__middle`; default `false` |
 | Additive-first | Новые API только опциональные |
 
@@ -59,7 +62,8 @@ const columns: FemsqTableColumn<MyRow>[] = [
 
 - Текст, case-insensitive `includes`, через тот же `filterValue` / `cellText`, что и глобальный поиск.
 - Client: фильтрация внутри компонента. Server: значения уходят в `@request.columnFilters` (поле опционально; отсутствие = нет активных колоночных фильтров).
-- Кастомный `#header-cell-*` у родителя перекрывает встроенный UI фильтра для этой колонки.
+- Кастомный `#header-cell-*` у родителя перекрывает встроенный UI шапки для этой колонки.
+- UI полей по умолчанию **скрыт** (`filtersVisible=false`). Кнопка `data-test="femsq-table-filters-toggle"` в chrome; при `showFilter \|\| showColumnFilters`. Экраны server-поиска: `:filters-visible="true"`.
 
 ### Fill-layout (`fill`, срез **0012**)
 
@@ -119,7 +123,7 @@ const columns: FemsqTableColumn<MyRow>[] = [
 | # | Потребность | Сейчас | Зачем (Rslt preview) | Задача |
 |---|-------------|---------|----------------------|--------|
 | 1 | **Viewport containment** + H/V scroll без раздувания родителей (`min-width: 0`, рамка с собственным overflow) | Срез **`fill`** (2026-08-24): V-scroll в flex/splitter; H-scroll / wide Rslt — ещё открыто | Много колонок срезов Rslt | **0012** |
-| 2 | **Sticky header** (+ ideally sticky filter-row) внутри viewport | В visual-target заявлено; в CSS/коде sticky **нет** | Длинный список строк | **0011** |
+| 2 | **Sticky header** (+ filter row внутри той же `th`) внутри viewport | ✅ при `fill` (v0.1.11): sticky `thead th`; filter в той же ячейке | Длинный список строк | **0011** |
 | 3 | **Multiline / wrap заголовков** (2–3 строки, clamp) | `.femsq-table__header-label { white-space: nowrap }` | Длинные подписи Excel (`2026. II-й квартал…`) | **0013** |
 | 4 | **`@cell-click`** (или эквивалент) с `(row, column, value/text)` | Только `@row-click`; ячейка — через `#body-cell-*` + свой click | Нижняя detail-панель текста ячейки | **0014** |
 | 5 | Согласованность **sticky + границы колонок** (избегать sticky + `border-collapse: collapse`) | Уточнить при реализации на QTable/обёртке | th/td не разъезжаются при H-scroll | **0011** |
