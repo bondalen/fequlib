@@ -1,6 +1,6 @@
 {
   "name": "fequlib",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "private": true,
   "description": "Quasar UI Kit for FEMSQ and related projects (FemsqTable first)",
   "type": "module",
