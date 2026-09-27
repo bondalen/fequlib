@@ -506,10 +506,13 @@ defineExpose({
 
 <style scoped>
 .femsq-table {
+  /*
+   * Sticky header surface: host sets --fequlib-table-header-* on html[data-femsq-theme].
+   * Do not reassign those tokens here (would override host). Do NOT use --q-dark-page.
+   */
   --fequlib-table-header-h: 1.75rem;
   --fequlib-table-filter-row-h: 1.75rem;
   --fequlib-table-sort-slot-w: 1.25rem;
-  --fequlib-table-header-bg: var(--q-dark-page, #fff);
 
   display: flex;
   flex-direction: column;
@@ -573,16 +576,18 @@ defineExpose({
   position: sticky;
   top: 0;
   z-index: 3;
-  background: var(--fequlib-table-header-bg);
+  background: var(--fequlib-table-header-bg, var(--femsq-bg-elevated, #ffffff));
+  color: var(--fequlib-table-header-color, var(--femsq-text, inherit));
   background-clip: padding-box;
 }
 
 .femsq-table__th {
   vertical-align: top;
+  color: var(--fequlib-table-header-color, var(--femsq-text, inherit));
 }
 
 /* Hide Quasar default sort glyph — arrow lives in sort-slot */
-.femsq-table__th :deep(.q-table__sort-icon) {
+.femsq-table :deep(thead th .q-table__sort-icon) {
   display: none !important;
 }
 
@@ -592,6 +597,7 @@ defineExpose({
   align-items: stretch;
   gap: 2px;
   min-width: 0;
+  color: var(--fequlib-table-header-color, var(--femsq-text, inherit));
 }
 
 .femsq-table__header-row1 {
@@ -610,6 +616,7 @@ defineExpose({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--fequlib-table-header-color, var(--femsq-text, inherit));
 }
 
 .femsq-table__sort-slot {
