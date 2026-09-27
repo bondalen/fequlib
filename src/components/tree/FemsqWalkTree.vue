@@ -15,7 +15,7 @@
       :columns="listColumns"
       :column-sets="listColumnSets"
       v-model:expanded-keys="expandedKeys"
-      v-model:selected-key="selectedKey"
+      v-model:selected-key="selectedKeyModel"
       v-model:loading-keys="loadingKeys"
       @load="onLoad"
     >
@@ -42,7 +42,7 @@
       node-key="id"
       :nodes="nodes"
       v-model:expanded-keys="expandedKeys"
-      v-model:selected-key="selectedKey"
+      v-model:selected-key="selectedKeyModel"
       v-model:loading-keys="loadingKeys"
       @load="onLoad"
     >
@@ -118,6 +118,8 @@ const props = withDefaults(
     rootId?: number | null;
     /** Непрозрачная строка хоста. Меняется целиком и не разбирается. */
     rootsToken?: string;
+    /** Выбор строки; хост может читать и задавать. */
+    selectedKey?: FemsqTreeKey | null;
     fetchNode: FemsqWalkFetchNode;
     fetchExpand: FemsqWalkFetchExpand;
     fetchQuery?: FemsqWalkFetchQuery;
@@ -128,6 +130,7 @@ const props = withDefaults(
   {
     rootId: null,
     rootsToken: '',
+    selectedKey: undefined,
     rootClass: '',
     dataTest: undefined
   }
@@ -135,16 +138,29 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   action: [context: FemsqWalkActionContext];
+  'update:selectedKey': [value: FemsqTreeKey | null];
 }>();
 
 const nodes = ref<FemsqWalkNode[]>([]);
 const expandedKeys = ref<FemsqTreeKey[]>([]);
-const selectedKey = ref<FemsqTreeKey | null>(null);
+const internalSelectedKey = ref<FemsqTreeKey | null>(null);
 const loadingKeys = ref<FemsqTreeKey[]>([]);
 const error = ref('');
 const missingRoot = ref(false);
 const rootLoading = ref(false);
 let generation = 0;
+
+const selectedKeyModel = computed({
+  get(): FemsqTreeKey | null {
+    return props.selectedKey === undefined ? internalSelectedKey.value : props.selectedKey;
+  },
+  set(value: FemsqTreeKey | null): void {
+    if (props.selectedKey === undefined) {
+      internalSelectedKey.value = value;
+    }
+    emit('update:selectedKey', value);
+  }
+});
 
 const listView = computed(() => usesWalkList(props.spec));
 const listColumnSets = computed(() => walkListColumnSetsOf(props.spec) ?? []);
@@ -177,7 +193,7 @@ async function loadRoot(token: string) {
   const gen = ++generation;
   nodes.value = [];
   expandedKeys.value = [];
-  selectedKey.value = null;
+  selectedKeyModel.value = null;
   loadingKeys.value = [];
   error.value = '';
   if (!token) {
@@ -205,7 +221,7 @@ async function loadRoot(token: string) {
         props.spec
       );
       nodes.value = [node];
-      selectedKey.value = node.id;
+      selectedKeyModel.value = node.id;
       return;
     }
     const queryId = props.spec.root.queryId ?? '';
@@ -222,6 +238,10 @@ async function loadRoot(token: string) {
         props.spec
       )
     );
+    expandedKeys.value = nodes.value.map((node) => node.id);
+    if (nodes.value[0]) {
+      selectedKeyModel.value = nodes.value[0].id;
+    }
   } catch (cause) {
     if (gen !== generation) {
       return;

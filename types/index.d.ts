@@ -536,6 +536,7 @@ export declare const FemsqWalkTree: (props: {
   spec: FemsqWalkTreeSpec;
   rootId?: number | null;
   rootsToken?: string;
+  selectedKey?: FemsqTreeKey | null;
   fetchNode: FemsqWalkFetchNode;
   fetchExpand: FemsqWalkFetchExpand;
   fetchQuery?: FemsqWalkFetchQuery;
