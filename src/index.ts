@@ -46,11 +46,22 @@ export {
 } from './components/tree/femsq-tree';
 export { default as FemsqTreeList } from './components/tree/FemsqTreeList.vue';
 export {
+  TREE_LIST_DATA_COL_MIN_PX,
+  TREE_LIST_DEFAULT_INDENT,
+  TREE_LIST_LABEL_DEFAULT_PX,
+  TREE_LIST_LABEL_MIN_PX,
+  TREE_LIST_TOGGLE_DEFAULT_PX,
+  TREE_LIST_TOGGLE_MIN_PX,
   treeListCellText,
   treeListColumnTracks,
+  treeListDataColumnsMinWidthPx,
+  treeListDataColumnsTemplate,
+  treeListDataTrackCount,
   treeListFolderShowsSetLabels,
   treeListGroupCaptionFlags,
+  treeListInitialDataWidths,
   treeListLevelMatches,
+  treeListParseWidthPx,
   treeListRowIndentPx,
   treeListSetCellText,
   treeListSetForNode,

@@ -12,7 +12,11 @@ export interface FemsqTreeListContext<Node extends FemsqTreeNodeBase = FemsqTree
   columnSets: FemsqTreeListColumnSet<Node>[];
   useColumnSets: boolean;
   trackCount: number;
+  dataTrackCount: number;
   hasActions: boolean;
+  toggleWidthPx: number;
+  labelWidthPx: number;
+  dataWidthsPx: number[];
   expandOnClick: boolean;
   selectable: boolean;
   lazy: boolean;
@@ -21,6 +25,8 @@ export interface FemsqTreeListContext<Node extends FemsqTreeNodeBase = FemsqTree
   isLoading: (key: FemsqTreeKey) => boolean;
   onRowClick: (evt: Event, node: Node, key: FemsqTreeKey) => void;
   onToggle: (evt: Event, node: Node, key: FemsqTreeKey) => void;
+  beginResizeNav: (part: 'toggle' | 'label' | 'zone', clientX: number) => void;
+  beginResizeData: (index: number, clientX: number) => void;
 }
 
 export const femsqTreeListContextKey: InjectionKey<FemsqTreeListContext> = Symbol('FemsqTreeList');

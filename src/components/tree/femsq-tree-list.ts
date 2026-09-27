@@ -14,6 +14,24 @@ export type FemsqTreeListLevel = string;
 /** Зарезервированные значения `column.level`: не метки ветви. */
 export type FemsqTreeListStructuralLevel = 'table' | 'edge';
 
+/** Default indent (px). Половина прежних 16. */
+export const TREE_LIST_DEFAULT_INDENT = 8;
+
+/** Минимальная ширина поля в правой зоне (px). */
+export const TREE_LIST_DATA_COL_MIN_PX = 96;
+
+/** Минимальная ширина слота развёртки (px). */
+export const TREE_LIST_TOGGLE_MIN_PX = 24;
+
+/** Минимальная ширина подписи ветви в nav (px). */
+export const TREE_LIST_LABEL_MIN_PX = 120;
+
+/** Стартовая ширина слота развёртки (px). */
+export const TREE_LIST_TOGGLE_DEFAULT_PX = 28;
+
+/** Стартовая ширина подписи ветви (px). */
+export const TREE_LIST_LABEL_DEFAULT_PX = 160;
+
 export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
   /** Стабильное имя колонки (ключ в шапке и строке). */
   name: string;
@@ -22,7 +40,10 @@ export interface FemsqTreeListColumn<Node extends FemsqTreeNodeBase = FemsqTreeN
   /** Поле узла. Нет поля — ячейка пустая. */
   field: string;
   align?: 'left' | 'right' | 'center';
-  /** Ширина трека CSS grid. По умолчанию `minmax(0, 1fr)`. */
+  /**
+   * Явная ширина трека (CSS). В двухзонной разметке правой зоны
+   * стартовая ширина берётся из числа px, иначе — `TREE_LIST_DATA_COL_MIN_PX`.
+   */
   width?: string;
   /**
    * Формат ячейки. Нет функции — `String(value)` для непустого значения.
@@ -103,19 +124,82 @@ export function treeListCellText<Node extends FemsqTreeNodeBase>(
   return String(value);
 }
 
+/** Число дорожек правой зоны: всё после нулевой (подпись в nav). */
+export function treeListDataTrackCount(trackCount: number): number {
+  const count = Number.isFinite(trackCount) && trackCount > 0 ? Math.floor(trackCount) : 0;
+  return Math.max(0, count - 1);
+}
+
 /**
- * Треки шапки и строк. Колонка действий — последняя, только если хост дал слот.
+ * Разобрать CSS-ширину колонки в px. Не число — `fallback`.
  */
-export function treeListColumnTracks(
+export function treeListParseWidthPx(width: string | undefined, fallback: number): number {
+  if (!width) {
+    return fallback;
+  }
+  const match = /^(\d+(?:\.\d+)?)px$/i.exec(width.trim());
+  if (!match) {
+    return fallback;
+  }
+  const value = Number(match[1]);
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+/**
+ * Стартовые ширины полей правой зоны (дорожки 1…N).
+ * Берёт `column.width` в px или `TREE_LIST_DATA_COL_MIN_PX`.
+ */
+export function treeListInitialDataWidths(
   columns: readonly { width?: string }[],
-  hasActions: boolean
-): string {
-  const tracks = columns.map((column) => column.width || 'minmax(0, 1fr)');
+  dataTrackCount: number,
+  minPx = TREE_LIST_DATA_COL_MIN_PX
+): number[] {
+  const count = Number.isFinite(dataTrackCount) && dataTrackCount > 0 ? Math.floor(dataTrackCount) : 0;
+  const widths: number[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const column = columns[index];
+    widths.push(Math.max(minPx, treeListParseWidthPx(column?.width, minPx)));
+  }
+  return widths;
+}
+
+/**
+ * CSS `grid-template-columns` правой зоны из ширин в px.
+ * Колонка действий — последняя, `max-content`.
+ */
+export function treeListDataColumnsTemplate(widths: readonly number[], hasActions: boolean): string {
+  const tracks = widths.map((width) => {
+    const px = Number.isFinite(width) && width > 0 ? Math.floor(width) : TREE_LIST_DATA_COL_MIN_PX;
+    return `${px}px`;
+  });
   if (hasActions) {
     tracks.push('max-content');
   }
   if (tracks.length === 0) {
     return 'minmax(0, 1fr)';
+  }
+  return tracks.join(' ');
+}
+
+export function treeListDataColumnsMinWidthPx(widths: readonly number[], hasActions: boolean): number {
+  const sum = widths.reduce((total, width) => total + (Number.isFinite(width) ? width : 0), 0);
+  return sum + (hasActions ? 48 : 0);
+}
+
+/**
+ * Совместимость: треки одной сетки (раньше вся строка).
+ * Двухзонная разметка использует `treeListDataColumnsTemplate`.
+ */
+export function treeListColumnTracks(
+  columns: readonly { width?: string }[],
+  hasActions: boolean
+): string {
+  const tracks = columns.map((column) => column.width || `minmax(${TREE_LIST_DATA_COL_MIN_PX}px, 1fr)`);
+  if (hasActions) {
+    tracks.push('max-content');
+  }
+  if (tracks.length === 0) {
+    return `minmax(${TREE_LIST_DATA_COL_MIN_PX}px, 1fr)`;
   }
   return tracks.join(' ');
 }

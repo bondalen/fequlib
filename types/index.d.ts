@@ -274,6 +274,33 @@ export declare function treeListColumnTracks(
   hasActions: boolean
 ): string;
 
+export declare const TREE_LIST_DEFAULT_INDENT: number;
+export declare const TREE_LIST_DATA_COL_MIN_PX: number;
+export declare const TREE_LIST_TOGGLE_MIN_PX: number;
+export declare const TREE_LIST_LABEL_MIN_PX: number;
+export declare const TREE_LIST_TOGGLE_DEFAULT_PX: number;
+export declare const TREE_LIST_LABEL_DEFAULT_PX: number;
+
+export declare function treeListDataTrackCount(trackCount: number): number;
+
+export declare function treeListParseWidthPx(width: string | undefined, fallback: number): number;
+
+export declare function treeListInitialDataWidths(
+  columns: readonly { width?: string }[],
+  dataTrackCount: number,
+  minPx?: number
+): number[];
+
+export declare function treeListDataColumnsTemplate(
+  widths: readonly number[],
+  hasActions: boolean
+): string;
+
+export declare function treeListDataColumnsMinWidthPx(
+  widths: readonly number[],
+  hasActions: boolean
+): number;
+
 export interface FemsqTreeListColumnSet<Node extends FemsqTreeNodeBase = FemsqTreeNodeBase> {
   level: string;
   columns: FemsqTreeListColumn<Node>[];

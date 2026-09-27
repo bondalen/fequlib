@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  TREE_LIST_DATA_COL_MIN_PX,
+  TREE_LIST_DEFAULT_INDENT,
   treeListCellText,
+  treeListDataColumnsTemplate,
+  treeListDataTrackCount,
   treeListFolderShowsSetLabels,
   treeListGroupCaptionFlags,
+  treeListInitialDataWidths,
   treeListLevelMatches,
+  treeListParseWidthPx,
   treeListRowIndentPx,
   treeListSetCellText,
   treeListSetForNode,
@@ -209,5 +215,25 @@ describe('columnSets', () => {
     expect(treeListSetForNode({ kind: 'folder' }, structural)?.level).toBe('edge');
     expect(treeListSetForNode({ kind: 'record', level: 'site' }, structural)).toBeUndefined();
     expect(treeListGroupCaptionFlags(['table', 'table', 'edge'])).toEqual([true, false, true]);
+  });
+});
+
+describe('two zones', () => {
+  it('keeps default indent at half of the former 16px', () => {
+    expect(TREE_LIST_DEFAULT_INDENT).toBe(8);
+    expect(treeListRowIndentPx(2, TREE_LIST_DEFAULT_INDENT)).toBe(16);
+  });
+
+  it('counts data tracks after the nav label and seeds min widths', () => {
+    expect(treeListDataTrackCount(9)).toBe(8);
+    expect(treeListDataTrackCount(1)).toBe(0);
+    expect(treeListParseWidthPx('120px', TREE_LIST_DATA_COL_MIN_PX)).toBe(120);
+    expect(treeListParseWidthPx('minmax(0, 1fr)', TREE_LIST_DATA_COL_MIN_PX)).toBe(
+      TREE_LIST_DATA_COL_MIN_PX
+    );
+    expect(
+      treeListInitialDataWidths([{ width: '140px' }, { width: 'bad' }, {}], 3)
+    ).toEqual([140, TREE_LIST_DATA_COL_MIN_PX, TREE_LIST_DATA_COL_MIN_PX]);
+    expect(treeListDataColumnsTemplate([96, 120], true)).toBe('96px 120px max-content');
   });
 });

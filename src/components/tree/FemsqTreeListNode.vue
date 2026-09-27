@@ -2,39 +2,57 @@
   <div class="femsq-tree-list-node">
     <div
       class="femsq-tree-list__line femsq-tree-list-node__row"
-      :class="{ 'femsq-tree-list-node__row--selected': selected }"
+      :class="{
+        'femsq-tree-list-node__row--selected': selected,
+        'femsq-tree-list-node__row--folder': isFolder
+      }"
       @click="onRowClick"
     >
-      <div
-        v-for="(cell, index) in rowCells"
-        :key="cell?.name ?? `track-${index}`"
-        class="femsq-tree-list__cell"
-        :style="cell ? cellStyle(cell) : undefined"
-      >
-        <template v-if="index === 0">
-          <span class="femsq-tree-list__indent" :style="indentStyle" />
-          <span class="femsq-tree-list__toggle" @click.stop>
-            <slot v-if="showToggle" name="toggle" v-bind="toggleSlotProps">
-              <QBtn
-                flat
-                dense
-                round
-                size="sm"
-                :icon="expanded ? 'expand_more' : 'chevron_right'"
-                :loading="loading"
-                :aria-label="expanded ? 'Свернуть' : 'Развернуть'"
-                @click="runToggle"
-              />
-            </slot>
-          </span>
-        </template>
+      <div class="femsq-tree-list__nav">
+        <span class="femsq-tree-list__indent" :style="indentStyle" />
+        <span class="femsq-tree-list__toggle" :style="{ width: `${ctx.toggleWidthPx}px` }" @click.stop>
+          <slot v-if="showToggle" name="toggle" v-bind="toggleSlotProps">
+            <QBtn
+              flat
+              dense
+              round
+              size="sm"
+              :icon="expanded ? 'expand_more' : 'chevron_right'"
+              :loading="loading"
+              :aria-label="expanded ? 'Свернуть' : 'Развернуть'"
+              @click="runToggle"
+            />
+          </slot>
+        </span>
+        <span class="femsq-tree-list__nav-label">
+          {{ cellTextAt(0) }}
+        </span>
         <span
-          class="femsq-tree-list__cell-text"
-          :class="{ 'femsq-tree-list__cell-text--muted': isFolderLabel(index) }"
-        >{{ cellTextAt(index) }}</span>
+          class="femsq-tree-list__resize femsq-tree-list__resize--zone"
+          title="Ширина левой зоны"
+          @mousedown.prevent.stop="ctx.beginResizeNav('zone', $event.clientX)"
+        />
       </div>
-      <div v-if="ctx.hasActions" class="femsq-tree-list__cell femsq-tree-list__cell--actions" @click.stop>
-        <slot name="actions" v-bind="nodeSlotProps" />
+      <div class="femsq-tree-list__data">
+        <div
+          v-for="index in dataIndexes"
+          :key="`data-${index}`"
+          class="femsq-tree-list__cell"
+          :style="dataCellStyle(index)"
+        >
+          <span
+            class="femsq-tree-list__cell-text"
+            :class="{ 'femsq-tree-list__cell-text--muted': isFolderLabel(index) }"
+          >{{ cellTextAt(index) }}</span>
+          <span
+            class="femsq-tree-list__resize"
+            title="Ширина колонки"
+            @mousedown.prevent.stop="ctx.beginResizeData(index - 1, $event.clientX)"
+          />
+        </div>
+        <div v-if="ctx.hasActions" class="femsq-tree-list__cell femsq-tree-list__cell--actions" @click.stop>
+          <slot name="actions" v-bind="nodeSlotProps" />
+        </div>
       </div>
     </div>
 
@@ -62,8 +80,7 @@
 
 <script setup lang="ts">
 /**
- * Строка FemsqTreeList. Слоты пробрасываются явно на каждый уровень.
- * Кнопка раскрытия только у не-листа, в первой колонке.
+ * Строка FemsqTreeList: nav (indent + toggle + подпись) и data (дорожки 1…N).
  */
 import { computed, inject, useSlots } from 'vue';
 import { QBtn, QSpinner } from 'quasar';
@@ -72,6 +89,7 @@ import FemsqTreeListSiblings from './FemsqTreeListSiblings.vue';
 import { femsqTreeListContextKey } from './femsq-tree-list-context';
 import { getChildren, getNodeKey, type FemsqTreeKey, type FemsqTreeNodeBase } from './femsq-tree';
 import {
+  TREE_LIST_DATA_COL_MIN_PX,
   treeListCellText,
   treeListFolderShowsSetLabels,
   treeListRowIndentPx,
@@ -112,6 +130,7 @@ const expanded = computed(() => ctx.isExpanded(nodeKey.value));
 const selected = computed(() => ctx.isSelected(nodeKey.value));
 const loading = computed(() => ctx.isLoading(nodeKey.value));
 const childNodes = computed(() => getChildren(props.node, ctx.childrenKey));
+const isFolder = computed(() => props.node.kind === 'folder');
 
 const nodeSlotProps = computed(() => ({
   node: props.node,
@@ -157,6 +176,10 @@ const rowCells = computed(() => {
   return cells;
 });
 
+const dataIndexes = computed(() =>
+  Array.from({ length: ctx.dataTrackCount }, (_, offset) => offset + 1)
+);
+
 function cellTextAt(index: number): string {
   if (ctx.useColumnSets) {
     return treeListSetCellText(props.node, rowSet.value, index);
@@ -169,11 +192,14 @@ function isFolderLabel(index: number): boolean {
   return ctx.useColumnSets && treeListFolderShowsSetLabels(props.node, index);
 }
 
-function cellStyle(column: FemsqTreeListColumn): Record<string, string> | undefined {
-  if (!column.align) {
-    return undefined;
+function dataCellStyle(trackIndex: number): Record<string, string> {
+  const width = ctx.dataWidthsPx[trackIndex - 1] ?? TREE_LIST_DATA_COL_MIN_PX;
+  const style: Record<string, string> = { width: `${width}px` };
+  const column = rowCells.value[trackIndex];
+  if (column?.align) {
+    style.textAlign = column.align;
   }
-  return { textAlign: column.align };
+  return style;
 }
 
 function runToggle(): void {
@@ -186,18 +212,12 @@ function onRowClick(evt: Event): void {
 </script>
 
 <style scoped>
-.femsq-tree-list-node,
-.femsq-tree-list-node__row,
-.femsq-tree-list-node__children {
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / -1;
-  align-items: center;
+.femsq-tree-list-node {
+  display: block;
   min-width: 0;
 }
 
 .femsq-tree-list-node__row {
-  min-height: var(--fequlib-tree-row-height, 32px);
   cursor: pointer;
   color: inherit;
   border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
@@ -207,7 +227,27 @@ function onRowClick(evt: Event): void {
   background: color-mix(in srgb, var(--q-primary) 12%, transparent);
 }
 
-.femsq-tree-list-node__children > .femsq-tree-list__status {
-  grid-column: 1 / -1;
+.femsq-tree-list-node__row--selected :deep(.femsq-tree-list__nav) {
+  background: color-mix(in srgb, var(--q-primary) 12%, transparent);
+}
+
+.femsq-tree-list-node__row--folder {
+  background: var(--fequlib-tree-folder-bg, color-mix(in srgb, currentColor 6%, transparent));
+  font-weight: var(--fequlib-tree-folder-weight, 600);
+  border-bottom-color: var(--fequlib-tree-folder-border, color-mix(in srgb, currentColor 16%, transparent));
+}
+
+.femsq-tree-list-node__row--folder :deep(.femsq-tree-list__nav) {
+  background: var(--fequlib-tree-folder-bg, color-mix(in srgb, currentColor 6%, transparent));
+}
+
+.femsq-tree-list-node__row--folder.femsq-tree-list-node__row--selected,
+.femsq-tree-list-node__row--folder.femsq-tree-list-node__row--selected :deep(.femsq-tree-list__nav) {
+  background: color-mix(in srgb, var(--q-primary) 12%, transparent);
+}
+
+.femsq-tree-list-node__children {
+  display: block;
+  min-width: 0;
 }
 </style>
