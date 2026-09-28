@@ -214,10 +214,21 @@ function onRowClick(evt: Event): void {
 <style scoped>
 .femsq-tree-list-node {
   display: block;
-  min-width: 0;
+  /* Не резать min-width линии — иначе H-scroll «широкой» строки не тянется. */
+  min-width: min-content;
 }
 
+/**
+ * Те же правила, что у `.femsq-tree-list__line` в List: scoped родителя
+ * на эту строку (дочерний SFC) не попадает → без flex nav|data стекутся.
+ */
 .femsq-tree-list-node__row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: max(100%, calc(var(--fequlib-tree-list-nav-width) + var(--fequlib-tree-list-data-min-width)));
+  min-height: var(--fequlib-tree-row-height, 28px);
   cursor: pointer;
   color: inherit;
   border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
@@ -248,6 +259,6 @@ function onRowClick(evt: Event): void {
 
 .femsq-tree-list-node__children {
   display: block;
-  min-width: 0;
+  min-width: min-content;
 }
 </style>

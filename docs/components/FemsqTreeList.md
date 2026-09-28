@@ -53,7 +53,7 @@ Controlled / uncontrolled — как у `FemsqTree`. `inheritAttrs: false`.
 - **Nav** (sticky left при горизонтальном скролле): toggle + подпись. Default `indent` **8px**. Ширины toggle / label / границы зон — session resize (min ≈24px + ≈120px).
 - **Data**: поля после нулевого. Сумма ширин ≥ N×96px (или после resize). Переполнение — `overflow` у `.femsq-tree-list__scroll` (общий H-scroll; nav не уезжает за счёт `position: sticky`).
 - Плоский `columns`: шапка в двух зонах. `columnSets`: sticky-шапка из комплекта **корня** (`headerLevel` или `treeListSetForNode(roots[0])`); вложенные уровни — muted labels на строке **folder** (0.1.8). Пустой ruler без подписей не используется.
-- Одна визуальная линия на узел (`flex-wrap: nowrap`); плотность строки ~28px.
+- Одна визуальная линия на узел: `display:flex; flex-wrap:nowrap` на **строке узла** в `FemsqTreeListNode` (scoped List на дочерний SFC не действует); плотность ~28px.
 - Empty: только при `children: []`. Пока `children === undefined` — loading, не empty.
 - Папка: класс `femsq-tree-list-node__row--folder` и токены `--fequlib-tree-folder-bg`, `--fequlib-tree-folder-weight`, `--fequlib-tree-folder-border` (fallback `color-mix` / inherit).
 
