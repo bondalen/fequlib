@@ -43,12 +43,16 @@ FEMSQ на ранней стадии UI; графики понадобятся �
 | C2 | `kind: bar` / `combo` | medium |
 | C3 | export PNG (`getDataURL`) для Jasper/WYSIWYG | low |
 | C4 | registry задача **0017** (уведомить docs-registry) | low |
+| C5 | `#zoom-extra` + `lineDash` (запрос FEMSQ `1402` / `1455`) → **0.1.16** ✅ | — |
 
 ## Отметки
 
 | Когда | Что |
 |-------|-----|
 | 2026-08-28 | Код, тесты, docs/components/FemsqChart.md; версия **0.1.1** |
+| 2026-09-27 | area/stack/step на `origin/main` **0.1.15** (`026be0d`) |
+| 2026-09-28 | Открыт объединённый запрос `1402`: zoom-extra + lineDash в одном релизе с TreeList/WalkTree UX |
+| 2026-09-28 | C5 на `origin/main` пакет **0.1.16**: слот `#zoom-extra`, `lineDash` → dashed. Feature-коммит не переписывался. |
 
 **Автор:** Cursor AI + Александр  
 **Создано:** 2026-08-28

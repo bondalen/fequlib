@@ -9,37 +9,47 @@
     </div>
     <template v-else>
       <div
-        v-if="showZoomControls"
+        v-if="showZoomBar"
         class="femsq-chart__zoom"
+        :class="{ 'femsq-chart__zoom--toolbar': hasZoomExtra }"
         data-test="femsq-chart-zoom"
       >
-        <button
-          type="button"
-          class="femsq-chart__zoom-btn"
-          title="Приблизить"
-          data-test="femsq-chart-zoom-in"
-          @click="onZoomIn"
+        <div
+          v-if="hasZoomExtra"
+          class="femsq-chart__zoom-extra"
+          data-test="femsq-chart-zoom-extra"
         >
-          +
-        </button>
-        <button
-          type="button"
-          class="femsq-chart__zoom-btn"
-          title="Отдалить"
-          data-test="femsq-chart-zoom-out"
-          @click="onZoomOut"
-        >
-          −
-        </button>
-        <button
-          type="button"
-          class="femsq-chart__zoom-btn"
-          title="Сбросить масштаб"
-          data-test="femsq-chart-zoom-reset"
-          @click="onZoomReset"
-        >
-          1:1
-        </button>
+          <slot name="zoom-extra" />
+        </div>
+        <div v-if="showZoomControls" class="femsq-chart__zoom-btns">
+          <button
+            type="button"
+            class="femsq-chart__zoom-btn"
+            title="Приблизить"
+            data-test="femsq-chart-zoom-in"
+            @click="onZoomIn"
+          >
+            +
+          </button>
+          <button
+            type="button"
+            class="femsq-chart__zoom-btn"
+            title="Отдалить"
+            data-test="femsq-chart-zoom-out"
+            @click="onZoomOut"
+          >
+            −
+          </button>
+          <button
+            type="button"
+            class="femsq-chart__zoom-btn"
+            title="Сбросить масштаб"
+            data-test="femsq-chart-zoom-reset"
+            @click="onZoomReset"
+          >
+            1:1
+          </button>
+        </div>
       </div>
       <VChart
         class="femsq-chart__canvas"
@@ -52,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useSlots, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -128,6 +138,7 @@ const props = withDefaults(
 );
 
 const $q = useQuasar();
+const slots = useSlots();
 
 /** Окно dataZoom по X в процентах (0–100). */
 const xZoom = ref({ start: 0, end: 100 });
@@ -139,6 +150,12 @@ const hasData = computed(() => {
 });
 
 const showZoomControls = computed(() => !!props.spec?.zoomControls && hasData.value);
+
+/** Слот хоста слева от кнопок масштаба. */
+const hasZoomExtra = computed(() => typeof slots['zoom-extra'] === 'function');
+
+/** Панель масштаба: кнопки и/или слот #zoom-extra. */
+const showZoomBar = computed(() => hasData.value && (showZoomControls.value || hasZoomExtra.value));
 
 watch(
   () => props.spec,
@@ -364,7 +381,30 @@ const chartOption = computed((): EChartsOption => {
   right: 4px;
   z-index: 2;
   display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/** Слот #zoom-extra: строка над canvas — [extra | + − 1:1]. */
+.femsq-chart__zoom--toolbar {
+  position: relative;
+  top: auto;
+  right: auto;
+  width: 100%;
+  flex-shrink: 0;
+  padding: 0 0 4px;
+  box-sizing: border-box;
+}
+.femsq-chart__zoom-extra {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.femsq-chart__zoom-btns {
+  display: flex;
   gap: 2px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 .femsq-chart__zoom-btn {
   min-width: 28px;

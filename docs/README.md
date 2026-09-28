@@ -17,7 +17,7 @@
 | [chat-plan-26-0809-docs-registry-vps.md](./development/notes/chats/chat-plan/chat-plan-26-0809-docs-registry-vps.md) | docs-registry → VPS (M0–M6 ✅) |
 | [chat-plan-26-0818-femsq-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0818-femsq-tree.md) | `FemsqTree` v1 (задача **0016**) |
 | [chat-plan-26-0926-femsq-tree-list.md](./development/notes/chats/chat-plan/chat-plan-26-0926-femsq-tree-list.md) | `FemsqTreeList` (задача **0018**) |
-| [chat-plan-26-0926-femsq-walk-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0926-femsq-walk-tree.md) | `FemsqWalkTree` (пакет **0.1.10**) |
+| [chat-plan-26-0926-femsq-walk-tree.md](./development/notes/chats/chat-plan/chat-plan-26-0926-femsq-walk-tree.md) | `FemsqWalkTree` (пакет **0.1.16**) |
 | [chat-plan-26-0824-fill-layout.md](./development/notes/chats/chat-plan/chat-plan-26-0824-fill-layout.md) | Срез **0012**: prop `fill` Table+Tree |
 | [chat-plan-26-0828-femsq-chart.md](./development/notes/chats/chat-plan/chat-plan-26-0828-femsq-chart.md) | **`FemsqChart` v1** (задача **0017**) |
 | [chat-resume-26-0809-sudz-gaps-registry-vps.md](./development/notes/chats/chat-resume/chat-resume-26-0809-sudz-gaps-registry-vps.md) | Резюме чата 2026-08-08…09 |

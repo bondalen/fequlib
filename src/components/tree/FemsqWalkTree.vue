@@ -14,6 +14,7 @@
       :nodes="nodes"
       :columns="listColumns"
       :column-sets="listColumnSets"
+      :header-level="headerLevel"
       v-model:expanded-keys="expandedKeys"
       v-model:selected-key="selectedKeyModel"
       v-model:loading-keys="loadingKeys"
@@ -32,7 +33,7 @@
           @click.stop="onAction(asWalkNode(node), action)"
         />
       </template>
-      <template #empty>пока нет дочерних узлов</template>
+      <template #empty>—</template>
     </FemsqTreeList>
     <FemsqTree
       v-else
@@ -70,7 +71,7 @@
           </tbody>
         </QMarkupTable>
       </template>
-      <template #empty>пока нет дочерних узлов</template>
+      <template #empty>—</template>
     </FemsqTree>
   </div>
 </template>
@@ -106,6 +107,7 @@ import {
   type FemsqWalkNode,
   type FemsqWalkTreeSpec
 } from './femsq-walk-tree';
+import { shouldLoad } from './femsq-tree';
 
 defineOptions({
   name: 'FemsqWalkTree'
@@ -120,6 +122,11 @@ const props = withDefaults(
     rootsToken?: string;
     /** Выбор строки; хост может читать и задавать. */
     selectedKey?: FemsqTreeKey | null;
+    /**
+     * Уровень комплекта для sticky-шапки list.
+     * Нет — `spec.root.level`.
+     */
+    headerLevel?: string;
     fetchNode: FemsqWalkFetchNode;
     fetchExpand: FemsqWalkFetchExpand;
     fetchQuery?: FemsqWalkFetchQuery;
@@ -131,6 +138,7 @@ const props = withDefaults(
     rootId: null,
     rootsToken: '',
     selectedKey: undefined,
+    headerLevel: undefined,
     rootClass: '',
     dataTest: undefined
   }
@@ -165,6 +173,13 @@ const selectedKeyModel = computed({
 const listView = computed(() => usesWalkList(props.spec));
 const listColumnSets = computed(() => walkListColumnSetsOf(props.spec) ?? []);
 const listColumns = computed(() => walkTreeListColumns(props.spec));
+const headerLevel = computed(() => {
+  if (typeof props.headerLevel === 'string' && props.headerLevel !== '') {
+    return props.headerLevel;
+  }
+  const fromRoot = props.spec.root.level;
+  return typeof fromRoot === 'string' && fromRoot !== '' ? fromRoot : undefined;
+});
 
 const reloadToken = computed(() => {
   const base = walkReloadToken(props.spec, props.rootId, props.rootsToken, props.fetchRoots);
@@ -241,6 +256,12 @@ async function loadRoot(token: string) {
     expandedKeys.value = nodes.value.map((node) => node.id);
     if (nodes.value[0]) {
       selectedKeyModel.value = nodes.value[0].id;
+    }
+    // Auto-expand без toggle не эмитит @load у list/outline — грузим детей явно.
+    for (const node of nodes.value) {
+      if (shouldLoad(node, true)) {
+        void onLoad({ node, key: node.id, reason: 'expand' });
+      }
     }
   } catch (cause) {
     if (gen !== generation) {

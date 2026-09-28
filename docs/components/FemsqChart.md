@@ -1,6 +1,6 @@
 # FemsqChart
 
-**Версия:** 0.1.15 (2026-09-27), `area` / `stack` / `step` на line-сериях  
+**Версия:** 0.1.16 (2026-09-28), `#zoom-extra` + `lineDash`; area/stack/step с **0.1.15**  
 **Платформа:** [ADR 010 FEMSQ](../../../femsq/docs/project/decisions/010-chart-platform-echarts.md) (ECharts 5)
 
 ## Назначение
@@ -21,7 +21,21 @@ const spec = buildSlotDynamicsChartSpec(
 
 - Ряд `Excel` — одна точка, цвет `#c10015`, без линии; подпись **вертикально (rotate 90, снизу вверх)**.
 - `zoomControls: true` — кнопки **+ / − / 1:1** (масштаб по оси X, правый край фиксирован при +) + zoom колесом.
+- Слот **`#zoom-extra`** — слева от кнопок в той же строке (комбо цепей портфелей и т.п.). Панель zoom видна, если есть `zoomControls` **или** заполнен слот.
+- `series[].lineDash: true` → пунктир (`lineStyle.type = 'dashed'`).
 - Отдельный `kind: 'area'` **не** вводится: область = `kind: 'line'` + `series[].area: true` (`areaStyle` в ECharts).
+
+### Zoom + extra
+
+```vue
+<FemsqChart :spec="spec" fill>
+  <template #zoom-extra>
+    <QSelect dense outlined emit-value map-options :options="chains" v-model="chainId" />
+  </template>
+</FemsqChart>
+```
+
+`ChartSpec.zoomControls` можно оставить `true`, чтобы рядом остались `+` / `−` / `1:1`.
 
 ### Stacked area (канон долга)
 
@@ -61,7 +75,7 @@ const spec: ChartSpec = {
 };
 ```
 
-Маппинг line-серий: `applyLineSeriesOptions` → `areaStyle.opacity` (default **0.45**), `stack`, `step`. Без `area` поведение КСДД «Динамика» без изменений.
+Маппинг line-серий: `applyLineSeriesOptions` → `areaStyle.opacity` (default **0.45**), `stack`, `step`, `lineDash`. Без `area` поведение КСДД «Динамика» без изменений.
 
 ## Props
 
@@ -84,9 +98,10 @@ const spec: ChartSpec = {
 | `areaOpacity` | `number` | `0.45`* | прозрачность заливки (*при маппинге) |
 | `stack` | `string` | — | имя стопки ECharts |
 | `step` | `'start' \| 'middle' \| 'end'` | — | ступенчатая линия/область |
+| `lineDash` | `boolean` | `false` | пунктир линии |
 | `chartType` | `'line' \| 'bar' \| 'scatter'` | из `kind` | тип серии |
 
-`ChartSpec.zoomControls` — панель масштаба.
+`ChartSpec.zoomControls` — кнопки масштаба. Слот `#zoom-extra` — доп. контролы в той же панели.
 
 `grid.containLabel: true`; при подписи Excel увеличен `right`. Подписи осей — `nameLocation: 'middle'` (не у правого края).
 

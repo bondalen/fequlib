@@ -59,6 +59,8 @@ export interface ChartSeriesSpec {
   stack?: string;
   /** Ступенчатая линия/область (`step`). */
   step?: ChartLineStep;
+  /** Пунктирная линия (`lineStyle.type = 'dashed'`). */
+  lineDash?: boolean;
 }
 
 /**
@@ -69,18 +71,19 @@ export interface LineSeriesAreaOptions {
   areaStyle?: unknown;
   stack?: string;
   step?: ChartLineStep | boolean;
+  lineStyle?: unknown;
 }
 
 /**
- * Маппит `area` / `areaOpacity` / `stack` / `step` из ChartSeriesSpec в опции line-серии.
+ * Маппит `area` / `areaOpacity` / `stack` / `step` / `lineDash` из ChartSeriesSpec в опции line-серии.
  * Чистая функция для unit-тестов без монтирования Vue.
  *
  * @param line мутабельный объект опций line-серии
- * @param ser спецификация серии (достаточно полей area/stack/step)
+ * @param ser спецификация серии
  */
 export function applyLineSeriesOptions(
   line: LineSeriesAreaOptions,
-  ser: Pick<ChartSeriesSpec, 'area' | 'areaOpacity' | 'stack' | 'step'>
+  ser: Pick<ChartSeriesSpec, 'area' | 'areaOpacity' | 'stack' | 'step' | 'lineDash'>
 ): void {
   if (ser.area) {
     line.areaStyle = { opacity: ser.areaOpacity ?? 0.45 };
@@ -90,6 +93,16 @@ export function applyLineSeriesOptions(
   }
   if (ser.step) {
     line.step = ser.step;
+  }
+  if (ser.lineDash) {
+    const prev =
+      line.lineStyle && typeof line.lineStyle === 'object'
+        ? (line.lineStyle as Record<string, unknown>)
+        : {};
+    // Не трогаем «невидимую» линию (showLine: false → width 0).
+    if (prev.width !== 0) {
+      line.lineStyle = { ...prev, type: 'dashed' };
+    }
   }
 }
 

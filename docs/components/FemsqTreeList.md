@@ -16,7 +16,8 @@
 | `nodes` | `Node[]` | корни; обязательный |
 | `nodeKey` | `string \| ((node) => Key)` | обязательный |
 | `columns` | `FemsqTreeListColumn<Node>[]` | одна липкая шапка, если нет `columnSets` |
-| `columnSets` | `FemsqTreeListColumnSet<Node>[]` | комплекты ветвей; тогда липкой шапки всех уровней нет |
+| `columnSets` | `FemsqTreeListColumnSet<Node>[]` | комплекты ветвей; липкая шапка из комплекта корня |
+| `headerLevel` | `string` | уровень sticky-шапки при `columnSets`; нет — комплект первого корня |
 | `childrenKey` | `string`, default `'children'` | поле детей |
 | `leafKey` | `string`, default `'leaf'` | `true` — лист, кнопки раскрытия нет |
 | `expandedKeys` | `Key[]` | v-model: какие дети видны |
@@ -27,7 +28,7 @@
 | `selectable` | `boolean`, default `true` | клик переключает `selectedKey` |
 | `lazy` | `boolean`, default `false` | не loaded + не leaf → `@load` |
 | `rootClass` | `string` | класс корня |
-| `fill` | `boolean`, default `false` | высота родителя; скролл в `.femsq-tree-list__scroll`. Липкая шапка — только без `columnSets` |
+| `fill` | `boolean`, default `false` | высота родителя; скролл в `.femsq-tree-list__scroll`. Липкая шапка — flat `columns` или корневой `columnSet` |
 
 Controlled / uncontrolled — как у `FemsqTree`. `inheritAttrs: false`.
 
@@ -51,7 +52,9 @@ Controlled / uncontrolled — как у `FemsqTree`. `inheritAttrs: false`.
 
 - **Nav** (sticky left при горизонтальном скролле): toggle + подпись. Default `indent` **8px**. Ширины toggle / label / границы зон — session resize (min ≈24px + ≈120px).
 - **Data**: поля после нулевого. Сумма ширин ≥ N×96px (или после resize). Переполнение — `overflow` у `.femsq-tree-list__scroll` (общий H-scroll; nav не уезжает за счёт `position: sticky`).
-- Плоский `columns`: шапка тоже в двух зонах. `columnSets`: без глобальной sticky-шапки полей; сверху тонкая линейка resize; подписи на строке папки как в 0.1.8.
+- Плоский `columns`: шапка в двух зонах. `columnSets`: sticky-шапка из комплекта **корня** (`headerLevel` или `treeListSetForNode(roots[0])`); вложенные уровни — muted labels на строке **folder** (0.1.8). Пустой ruler без подписей не используется.
+- Одна визуальная линия на узел (`flex-wrap: nowrap`); плотность строки ~28px.
+- Empty: только при `children: []`. Пока `children === undefined` — loading, не empty.
 - Папка: класс `femsq-tree-list-node__row--folder` и токены `--fequlib-tree-folder-bg`, `--fequlib-tree-folder-weight`, `--fequlib-tree-folder-border` (fallback `color-mix` / inherit).
 
 Дорожек данных `treeListSetTrackCount` — максимум длин комплектов, не сумма и не число раскрытых узлов. Колонка `#actions` — последняя в data и в это число не входит. У короткого комплекта правые ячейки пустые.

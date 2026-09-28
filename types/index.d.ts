@@ -232,6 +232,8 @@ export interface FemsqTreeListProps<Node extends FemsqTreeNodeBase = FemsqTreeNo
   columns?: FemsqTreeListColumn<Node>[];
   /** Absent — sticky header from `columns`. Present — per-branch sets, track count is the widest set. */
   columnSets?: FemsqTreeListColumnSet<Node>[];
+  /** Level of the sticky header set when using `columnSets`. Absent — first root node's set. */
+  headerLevel?: string;
   childrenKey?: string;
   leafKey?: string;
   expandedKeys?: FemsqTreeKey[];
@@ -537,6 +539,7 @@ export declare const FemsqWalkTree: (props: {
   rootId?: number | null;
   rootsToken?: string;
   selectedKey?: FemsqTreeKey | null;
+  headerLevel?: string;
   fetchNode: FemsqWalkFetchNode;
   fetchExpand: FemsqWalkFetchExpand;
   fetchQuery?: FemsqWalkFetchQuery;
@@ -573,17 +576,20 @@ export interface ChartSeriesSpec {
   stack?: string;
   /** Ступенчатая линия/область (step). */
   step?: ChartLineStep;
+  /** Пунктирная линия (`lineStyle.type = 'dashed'`). */
+  lineDash?: boolean;
 }
 
 export interface LineSeriesAreaOptions {
   areaStyle?: unknown;
   stack?: string;
   step?: ChartLineStep | boolean;
+  lineStyle?: unknown;
 }
 
 export declare function applyLineSeriesOptions(
   line: LineSeriesAreaOptions,
-  ser: Pick<ChartSeriesSpec, 'area' | 'areaOpacity' | 'stack' | 'step'>
+  ser: Pick<ChartSeriesSpec, 'area' | 'areaOpacity' | 'stack' | 'step' | 'lineDash'>
 ): void;
 
 export interface ChartMarkerSpec {

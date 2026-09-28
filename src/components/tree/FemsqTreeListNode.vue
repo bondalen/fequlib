@@ -57,12 +57,12 @@
     </div>
 
     <div v-if="expanded && showToggle" class="femsq-tree-list-node__children">
-      <div v-if="loading" class="femsq-tree-list__status">
+      <div v-if="loading || childNodes === undefined" class="femsq-tree-list__status">
         <slot name="loading" v-bind="statusSlotProps">
           <QSpinner color="primary" size="1.1em" />
         </slot>
       </div>
-      <div v-else-if="!childNodes || childNodes.length === 0" class="femsq-tree-list__status femsq-tree-list__empty">
+      <div v-else-if="childNodes.length === 0" class="femsq-tree-list__status femsq-tree-list__empty">
         <slot name="empty" v-bind="statusSlotProps">—</slot>
       </div>
       <FemsqTreeListSiblings

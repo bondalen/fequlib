@@ -104,6 +104,16 @@ describe('femsq-chart', () => {
     expect(plain.step).toBeUndefined();
   });
 
+  it('applyLineSeriesOptions sets dashed lineStyle when lineDash is true', () => {
+    const line: Parameters<typeof applyLineSeriesOptions>[0] = {};
+    applyLineSeriesOptions(line, { lineDash: true });
+    expect(line.lineStyle).toEqual({ type: 'dashed' });
+
+    const hidden: Parameters<typeof applyLineSeriesOptions>[0] = { lineStyle: { width: 0, opacity: 0 } };
+    applyLineSeriesOptions(hidden, { lineDash: true });
+    expect(hidden.lineStyle).toEqual({ width: 0, opacity: 0 });
+  });
+
   it('zoomInWindow keeps right edge', () => {
     expect(zoomInWindow(0, 100, 2)).toEqual({ start: 50, end: 100 });
   });

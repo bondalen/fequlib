@@ -14,7 +14,7 @@
       <slot name="empty" :depth="0">—</slot>
     </div>
     <div v-else class="femsq-tree-list__scroll">
-      <div v-if="!useColumnSets" class="femsq-tree-list__header femsq-tree-list__line">
+      <div v-if="showStickyHeader" class="femsq-tree-list__header femsq-tree-list__line">
         <div class="femsq-tree-list__nav">
           <span class="femsq-tree-list__toggle" :style="{ width: `${toggleWidthPx}px` }" />
           <span class="femsq-tree-list__nav-label">
@@ -34,32 +34,6 @@
             :style="headerCellStyle(column, index)"
           >
             <span class="femsq-tree-list__cell-text">{{ column.label }}</span>
-            <span
-              class="femsq-tree-list__resize"
-              title="Ширина колонки"
-              @mousedown.prevent="beginResizeData(index, $event.clientX)"
-            />
-          </div>
-          <div v-if="hasActions" class="femsq-tree-list__cell femsq-tree-list__cell--actions" />
-        </div>
-      </div>
-      <div v-else class="femsq-tree-list__ruler femsq-tree-list__line">
-        <div class="femsq-tree-list__nav">
-          <span class="femsq-tree-list__toggle" :style="{ width: `${toggleWidthPx}px` }" />
-          <span class="femsq-tree-list__nav-label" />
-          <span
-            class="femsq-tree-list__resize femsq-tree-list__resize--zone"
-            title="Ширина левой зоны"
-            @mousedown.prevent="beginResizeNav('zone', $event.clientX)"
-          />
-        </div>
-        <div class="femsq-tree-list__data" :style="dataPaneStyle">
-          <div
-            v-for="(_, index) in dataWidthsPx"
-            :key="`ruler-${index}`"
-            class="femsq-tree-list__cell femsq-tree-list__cell--ruler"
-            :style="{ width: `${dataWidthsPx[index]}px` }"
-          >
             <span
               class="femsq-tree-list__resize"
               title="Ширина колонки"
@@ -109,6 +83,7 @@ import {
   treeListDataColumnsTemplate,
   treeListDataTrackCount,
   treeListInitialDataWidths,
+  treeListSetForNode,
   treeListSetTrackCount,
   type FemsqTreeListColumn,
   type FemsqTreeListColumnSet
@@ -129,6 +104,11 @@ const props = withDefaults(
      * Дорожек столько, сколько колонок у самого широкого комплекта.
      */
     columnSets?: FemsqTreeListColumnSet<Node>[];
+    /**
+     * Уровень комплекта для sticky-шапки при `columnSets`.
+     * Нет — комплект первого корня (`treeListSetForNode`).
+     */
+    headerLevel?: string;
     childrenKey?: string;
     leafKey?: string;
     expandedKeys?: FemsqTreeKey[];
@@ -148,6 +128,7 @@ const props = withDefaults(
   {
     columns: () => [],
     columnSets: () => [],
+    headerLevel: undefined,
     childrenKey: 'children',
     leafKey: 'leaf',
     expandedKeys: undefined,
@@ -208,8 +189,28 @@ const trackCount = computed(() =>
 );
 const dataTrackCount = computed(() => treeListDataTrackCount(trackCount.value));
 
+const headerColumnSet = computed(() => {
+  if (!useColumnSets.value) {
+    return undefined;
+  }
+  const sets = props.columnSets ?? [];
+  const explicit = props.headerLevel;
+  if (typeof explicit === 'string' && explicit !== '') {
+    return sets.find((set) => set.level === explicit);
+  }
+  const first = props.nodes[0];
+  if (first) {
+    return treeListSetForNode(first, sets);
+  }
+  return sets[0];
+});
+
 const seedDataColumns = computed(() => {
   if (useColumnSets.value) {
+    const header = headerColumnSet.value;
+    if (header?.columns.length) {
+      return header.columns.slice(1);
+    }
     const widest = (props.columnSets ?? []).reduce<FemsqTreeListColumnSet<Node> | undefined>((best, set) => {
       if (!best || set.columns.length > best.columns.length) {
         return set;
@@ -219,6 +220,13 @@ const seedDataColumns = computed(() => {
     return (widest?.columns ?? []).slice(1);
   }
   return props.columns.slice(1);
+});
+
+const showStickyHeader = computed(() => {
+  if (!useColumnSets.value) {
+    return props.columns.length > 0;
+  }
+  return (headerColumnSet.value?.columns.length ?? 0) > 0;
 });
 
 watch(
@@ -250,8 +258,18 @@ const dataPaneStyle = computed(() => ({
   minWidth: `${dataMinWidthPx.value}px`
 }));
 
-const headerNavLabel = computed(() => props.columns[0]?.label ?? '');
-const headerDataColumns = computed(() => props.columns.slice(1));
+const headerNavLabel = computed(() => {
+  if (useColumnSets.value) {
+    return headerColumnSet.value?.columns[0]?.label ?? '';
+  }
+  return props.columns[0]?.label ?? '';
+});
+const headerDataColumns = computed(() => {
+  if (useColumnSets.value) {
+    return (headerColumnSet.value?.columns ?? []).slice(1);
+  }
+  return props.columns.slice(1);
+});
 
 const rootStyle = computed(() => {
   const layout = {
@@ -479,8 +497,8 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
 
 <style scoped>
 .femsq-tree-list {
-  --fequlib-tree-row-height: 32px;
-  --fequlib-tree-row-padding-y: 4px;
+  --fequlib-tree-row-height: 28px;
+  --fequlib-tree-row-padding-y: 2px;
   --fequlib-tree-row-padding-x: 4px;
   --fequlib-tree-list-toggle: 28px;
   --fequlib-tree-folder-bg: color-mix(in srgb, currentColor 6%, transparent);
@@ -517,9 +535,10 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
 .femsq-tree-list__line {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  flex-wrap: nowrap;
+  align-items: center;
   min-width: max(100%, calc(var(--fequlib-tree-list-nav-width) + var(--fequlib-tree-list-data-min-width)));
-  min-height: var(--fequlib-tree-row-height, 32px);
+  min-height: var(--fequlib-tree-row-height, 28px);
 }
 
 .femsq-tree-list__header {
@@ -528,15 +547,6 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
   z-index: 3;
   font-weight: 600;
   border-bottom: 1px solid color-mix(in srgb, currentColor 24%, transparent);
-  background: var(--fequlib-tree-header-bg, var(--femsq-surface, Canvas));
-}
-
-.femsq-tree-list__ruler {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  min-height: 10px;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   background: var(--fequlib-tree-header-bg, var(--femsq-surface, Canvas));
 }
 
@@ -582,11 +592,6 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
   padding: var(--fequlib-tree-row-padding-y, 4px) var(--fequlib-tree-row-padding-x, 4px);
   color: inherit;
   box-sizing: border-box;
-}
-
-:deep(.femsq-tree-list__cell--ruler) {
-  min-height: 10px;
-  padding: 0;
 }
 
 :deep(.femsq-tree-list__cell-text) {
@@ -637,11 +642,19 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
   cursor: col-resize;
 }
 
-.femsq-tree-list__status,
-.femsq-tree-list__empty {
+.femsq-tree-list__status {
   padding: var(--fequlib-tree-row-padding-y) var(--fequlib-tree-row-padding-x);
   min-height: var(--fequlib-tree-row-height);
   color: inherit;
   opacity: 0.7;
+}
+
+.femsq-tree-list__empty {
+  padding: var(--fequlib-tree-row-padding-y) var(--fequlib-tree-row-padding-x);
+  min-height: calc(var(--fequlib-tree-row-height) * 0.7);
+  color: inherit;
+  opacity: 0.5;
+  font-size: 0.82em;
+  font-weight: 400;
 }
 </style>
