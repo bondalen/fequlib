@@ -634,10 +634,14 @@ provide(femsqTreeListContextKey, listContext as FemsqTreeListContext);
 }
 
 :deep(.femsq-tree-list__resize--zone) {
+  /* База `.resize` даёт height:100% → у пустого span в nav с align-items:center hit-area = 0. */
   position: relative;
+  top: auto;
   right: auto;
-  flex: 0 0 6px;
-  width: 6px;
+  flex: 0 0 8px;
+  width: 8px;
+  height: auto;
+  min-height: var(--fequlib-tree-row-height, 28px);
   align-self: stretch;
   cursor: col-resize;
 }
